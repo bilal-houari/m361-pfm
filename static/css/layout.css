@@ -32,6 +32,12 @@
     align-items: center;
     gap: calc(var(--spacing-unit) * 1.5);
     overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.collapsed .sidebar-brand {
+    justify-content: center;
+    padding: calc(var(--spacing-unit) * 3) 0;
 }
 
 .sidebar-logo {
@@ -50,8 +56,7 @@
 }
 
 .collapsed .sidebar-title {
-    opacity: 0;
-    pointer-events: none;
+    display: none;
 }
 
 .sidebar-nav {
