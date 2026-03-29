@@ -1,3 +1,4 @@
+/* Base Variables and Reset */
 :root {
     /* Colors */
     --primary-color: #007bff;
@@ -18,7 +19,7 @@
     /* Elements */
     --border-radius: 0px;
     --spacing-unit: 8px;
-    --shadow: none; /* No shadows as per light theme requirements */
+    --shadow: none;
     --border-width: 1px;
     
     /* Typography */
@@ -57,6 +58,11 @@ button, .btn {
     border-radius: var(--border-radius);
     padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-unit);
+    font-weight: 500;
 }
 
 .btn-primary {
@@ -76,4 +82,22 @@ button, .btn {
 
 .btn-outline:hover {
     border-color: var(--text-muted);
+}
+
+.btn-sm {
+    padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+    font-size: 0.8rem;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.font-weight-bold {
+    font-weight: 700;
+}
+
+.mx-2 {
+    margin-left: calc(var(--spacing-unit) * 2);
+    margin-right: calc(var(--spacing-unit) * 2);
 }

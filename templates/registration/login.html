@@ -6,7 +6,7 @@
 {% block auth_content %}
 <div class="auth-card">
     <div class="auth-header">
-        <img src="{% static 'img/logo.png' %}" alt="PreSkool Logo" style="width: 80px; height: 80px; object-fit: contain;">
+        <img src="{% static 'img/logo.png' %}" alt="PreSkool Logo" class="auth-logo">
         <h1>PreSkool</h1>
         <p class="text-muted">Sign in with your school email</p>
     </div>
@@ -15,7 +15,7 @@
         {% csrf_token %}
         
         {% if form.errors %}
-            <div class="alert alert-danger" style="color: #dc3545; border-bottom: 1px solid #dc3545; padding-bottom: 8px; margin-bottom: 16px;">
+            <div class="alert alert-danger">
                 Invalid username or password.
             </div>
         {% endif %}
@@ -30,14 +30,14 @@
             <input type="password" name="password" id="id_password" class="form-input" required placeholder="••••••••">
         </div>
         
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer;">
+        <div class="form-actions">
+            <label class="form-checkbox-label">
                 <input type="checkbox" name="remember"> Remember me
             </label>
-            <a href="{% url 'password_reset' %}" style="font-size: 0.85rem;">Forgot password?</a>
+            <a href="{% url 'password_reset' %}" class="form-link">Forgot password?</a>
         </div>
         
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
     </form>
     
     <div class="auth-footer">
