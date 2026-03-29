@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Students - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Students</h2>
+        <p>Manage school students and their enrollment details.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'student-add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Student
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Adm. No</th>
+                <th>Name</th>
+                <th>Grade</th>
+                <th>Email</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td><span class="badge">{{ student.admission_number }}</span></td>
+                <td>
+                    <span class="font-weight-bold">{{ student.user.get_full_name }}</span>
+                </td>
+                <td>{{ student.grade }}</td>
+                <td class="text-muted">{{ student.user.email }}</td>
+                <td style="text-align: right;">
+                    <a href="{% url 'student-edit' student.pk %}" class="btn btn-sm btn-outline" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="javascript:void(0)" 
+                       data-url="{% url 'student-delete' student.pk %}"
+                       data-name="the student: {{ student.user.get_full_name }}"
+                       onclick="openDeleteModal(this.dataset.url, this.dataset.name)"
+                       class="btn btn-sm btn-outline" 
+                       title="Delete" 
+                       style="color: #dc3545;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="table-empty">
+                    <i class="fas fa-user-graduate"></i>
+                    <p>No students found. <a href="{% url 'student-add' %}">Add one now</a>.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Edit Teacher - PreSkool{% else %}Add Teacher - PreSkool{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>{% if object %}Edit Teacher{% else %}Add Teacher{% endif %}</h2>
+        <p>{% if object %}Modify existing teacher profile and account details.{% else %}Register a new teacher and create their access account.{% endif %}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'teacher-list' %}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--spacing-unit) * 3);">
+            <!-- User Fields -->
+            <div class="form-section" style="grid-column: span 2; border-bottom: var(--border-width) solid var(--border-color); margin-bottom: calc(var(--spacing-unit) * 2); padding-bottom: var(--spacing-unit);">
+                <h3 style="font-size: 1rem; color: var(--text-dark);">Account Information</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="id_first_name">First Name</label>
+                <input type="text" name="first_name" id="id_first_name" class="form-input" value="{{ form.first_name.value|default:'' }}" required>
+                {% if form.first_name.errors %}<p class="alert alert-danger text-sm">{{ form.first_name.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_last_name">Last Name</label>
+                <input type="text" name="last_name" id="id_last_name" class="form-input" value="{{ form.last_name.value|default:'' }}" required>
+                {% if form.last_name.errors %}<p class="alert alert-danger text-sm">{{ form.last_name.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email (Username)</label>
+                <input type="email" name="email" id="id_email" class="form-input" value="{{ form.email.value|default:'' }}" required>
+                {% if form.email.errors %}<p class="alert alert-danger text-sm">{{ form.email.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password">Password</label>
+                <input type="password" name="password" id="id_password" class="form-input" placeholder="{% if object %}********{% else %}Default: Email address{% endif %}" {% if object %}disabled{% endif %}>
+                <p class="text-muted text-sm">{% if not object %}If left blank, the email address will be used as the default password.{% else %}Password changes are managed via profile settings.{% endif %}</p>
+            </div>
+
+            <!-- Teacher Fields -->
+            <div class="form-section" style="grid-column: span 2; border-bottom: var(--border-width) solid var(--border-color); margin-bottom: calc(var(--spacing-unit) * 2); padding-bottom: var(--spacing-unit); margin-top: var(--spacing-unit);">
+                <h3 style="font-size: 1rem; color: var(--text-dark);">Profile Information</h3>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_specialization">Specialization</label>
+                <input type="text" name="specialization" id="id_specialization" class="form-input" value="{{ form.specialization.value|default:'' }}" required>
+                {% if form.specialization.errors %}<p class="alert alert-danger text-sm">{{ form.specialization.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_date_of_birth">Date of Birth</label>
+                <input type="date" name="date_of_birth" id="id_date_of_birth" class="form-input" value="{{ form.date_of_birth.value|date:'Y-m-d'|default:'' }}" required>
+                {% if form.date_of_birth.errors %}<p class="alert alert-danger text-sm">{{ form.date_of_birth.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_phone_number">Phone Number</label>
+                <input type="text" name="phone_number" id="id_phone_number" class="form-input" value="{{ form.phone_number.value|default:'' }}">
+                {% if form.phone_number.errors %}<p class="alert alert-danger text-sm">{{ form.phone_number.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label" for="id_address">Address</label>
+                <textarea name="address" id="id_address" class="form-input" rows="2">{{ form.address.value|default:'' }}</textarea>
+                {% if form.address.errors %}<p class="alert alert-danger text-sm">{{ form.address.errors|striptags }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-footer" style="margin-top: calc(var(--spacing-unit) * 2); border-top: var(--border-width) solid var(--border-color); padding-top: calc(var(--spacing-unit) * 3); display: flex; justify-content: flex-end; gap: var(--spacing-unit);">
+            <a href="{% url 'teacher-list' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {% if object %}Save Changes{% else %}Register Teacher{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

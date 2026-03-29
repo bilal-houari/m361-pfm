@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Edit Department - PreSkool{% else %}Add Department - PreSkool{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>{% if object %}Edit Department{% else %}Add Department{% endif %}</h2>
+        <p>{% if object %}Modify existing department details.{% else %}Create a new department in the system.{% endif %}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'department-list' %}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="form-group">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                   name="{{ field.name }}" 
+                   id="{{ field.id_for_label }}"
+                   class="form-input"
+                   value="{{ field.value|default:'' }}"
+                   {% if field.field.required %}required{% endif %}>
+            {% if field.help_text %}
+            <p class="text-muted text-sm">{{ field.help_text }}</p>
+            {% endif %}
+            {% if field.errors %}
+            <p class="alert alert-danger">{{ field.errors|striptags }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="form-footer" style="margin-top: calc(var(--spacing-unit) * 2); border-top: var(--border-width) solid var(--border-color); padding-top: calc(var(--spacing-unit) * 3); display: flex; justify-content: flex-end; gap: var(--spacing-unit);">
+            <a href="{% url 'department-list' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {% if object %}Save Changes{% else %}Add Department{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

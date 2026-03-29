@@ -15,6 +15,16 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/layout.css' %}">
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    
+    <script>
+        // Set sidebar state immediately to prevent "jump" on load
+        (function() {
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                document.documentElement.classList.add('collapsed');
+            }
+        })();
+    </script>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -65,13 +75,55 @@
 
         // Load preferences
         document.addEventListener('DOMContentLoaded', () => {
-            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            if (sidebarCollapsed) {
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isCollapsed) {
                 document.body.classList.add('collapsed');
             }
+            // Enable transitions after initial state is set
+            document.documentElement.classList.add('sidemenu-ready');
+        });
+
+        // Global Delete Modal Logic
+        function openDeleteModal(url, itemName) {
+            const modal = document.getElementById('deleteModal');
+            const form = document.getElementById('deleteForm');
+            const nameSpan = document.getElementById('deleteItemName');
+            
+            form.action = url;
+            nameSpan.textContent = itemName;
+            modal.classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDeleteModal();
         });
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     {% block extra_js %}{% endblock %}
+
+    <!-- Global Delete Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3 class="modal-title">Confirm Deletion</h3>
+            <p class="modal-message">
+                Are you sure you want to delete <strong id="deleteItemName"></strong>?<br>
+                This action cannot be undone.
+            </p>
+            <form id="deleteForm" method="post">
+                {% csrf_token %}
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: #dc3545;">Delete Permanently</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

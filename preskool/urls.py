@@ -21,5 +21,11 @@ from core.views import home
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('students/', include('students.urls')),
+    path('teachers/', include('teachers.urls')),
+    path('departments/', include('departments.urls')),
+    path('subjects/', include('subjects.urls')),
+    path('holidays/', include('holidays.urls')),
+    path('exams/', include('exams.urls')),
     path('', home, name='home'),
 ]

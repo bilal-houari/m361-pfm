@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Exams - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Exams Schedule</h2>
+        <p>Plan exams and manage student results.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'exam-add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Exam
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Exam Name</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Max Marks</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in exams %}
+            <tr>
+                <td class="font-weight-bold">{{ exam.name }}</td>
+                <td><span class="badge">{{ exam.subject.name }}</span></td>
+                <td>{{ exam.date|date:"M d, Y" }}</td>
+                <td>{{ exam.max_marks }}</td>
+                <td style="text-align: right;">
+                    <a href="{% url 'exam-results' exam.pk %}" class="btn btn-sm btn-outline" title="Results" style="color: var(--primary-color);">
+                        <i class="fas fa-list-check"></i> Results
+                    </a>
+                    <a href="{% url 'exam-edit' exam.pk %}" class="btn btn-sm btn-outline" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="javascript:void(0)" 
+                       data-url="{% url 'exam-delete' exam.pk %}"
+                       data-name="the exam: {{ exam.name }}"
+                       onclick="openDeleteModal(this.dataset.url, this.dataset.name)"
+                       class="btn btn-sm btn-outline" 
+                       title="Delete" 
+                       style="color: #dc3545;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="table-empty">
+                    <i class="fas fa-file-invoice"></i>
+                    <p>No exams scheduled. <a href="{% url 'exam-add' %}">Add one now</a>.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

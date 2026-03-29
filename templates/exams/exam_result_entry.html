@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Enter Exam Results - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Enter Results: {{ exam.name }}</h2>
+        <p>Subject: {{ exam.subject.name }} | Max Marks: {{ exam.max_marks }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'exam-list' %}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to Schedule
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <div class="table-container" style="margin-bottom: 20px;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Adm. No</th>
+                        <th>Student Name</th>
+                        <th style="width: 200px;">Marks Obtained</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td><span class="badge">{{ student.adm_no }}</span></td>
+                        <td class="font-weight-bold">{{ student.name }}</td>
+                        <td>
+                            <input type="number" 
+                                   name="marks_{{ student.id }}" 
+                                   class="form-input" 
+                                   value="{{ student.marks }}" 
+                                   step="0.01" 
+                                   min="0" 
+                                   max="{{ exam.max_marks }}"
+                                   placeholder="Enter marks">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            No students enrolled in the system.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-footer" style="display: flex; justify-content: flex-end; gap: var(--spacing-unit);">
+            <a href="{% url 'exam-list' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save All Results
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

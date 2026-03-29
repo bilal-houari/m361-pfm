@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Subjects - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Subjects</h2>
+        <p>Manage curriculum subjects and assigned teachers.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'subject-add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Subject
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Teachers</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subjects %}
+            <tr>
+                <td><span class="badge">{{ subject.code }}</span></td>
+                <td class="font-weight-bold">{{ subject.name }}</td>
+                <td>{{ subject.department.name }}</td>
+                <td>
+                    {% for teacher in subject.teachers.all %}
+                        <span class="text-sm">{{ teacher.user.get_full_name }}{% if not forloop.last %}, {% endif %}</span>
+                    {% empty %}
+                        <span class="text-muted text-sm">No teachers assigned</span>
+                    {% endfor %}
+                </td>
+                <td style="text-align: right;">
+                    <a href="{% url 'subject-edit' subject.pk %}" class="btn btn-sm btn-outline" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="javascript:void(0)" 
+                       data-url="{% url 'subject-delete' subject.pk %}"
+                       data-name="the subject: {{ subject.name }}"
+                       onclick="openDeleteModal(this.dataset.url, this.dataset.name)"
+                       class="btn btn-sm btn-outline" 
+                       title="Delete" 
+                       style="color: #dc3545;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="table-empty">
+                    <i class="fas fa-book"></i>
+                    <p>No subjects found. <a href="{% url 'subject-add' %}">Add one now</a>.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

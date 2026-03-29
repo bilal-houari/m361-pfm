@@ -6,7 +6,7 @@
     </div>
 
     <nav class="sidebar-nav">
-        <a href="/" class="nav-item active">
+        <a href="/" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
             <i class="fas fa-th-large"></i>
             <span>Dashboard</span>
         </a>
@@ -18,19 +18,19 @@
                 <i class="fas fa-chevron-down chevron"></i>
             </div>
             <div class="nav-section-content">
-                <a href="#" class="nav-item">
+                <a href="{% url 'student-list' %}" class="nav-item {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-user-graduate"></i>
                     <span>Students</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{% url 'teacher-list' %}" class="nav-item {% if 'teacher' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-chalkboard-teacher"></i>
                     <span>Teachers</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{% url 'department-list' %}" class="nav-item {% if 'department' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-building"></i>
                     <span>Departments</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{% url 'subject-list' %}" class="nav-item {% if 'subject' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-book"></i>
                     <span>Subjects</span>
                 </a>
@@ -45,7 +45,7 @@
                 <i class="fas fa-chevron-down chevron"></i>
             </div>
             <div class="nav-section-content">
-                <a href="#" class="nav-item">
+                <a href="{% url 'exam-list' %}" class="nav-item {% if 'exam' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-file-invoice"></i>
                     <span>Exams</span>
                 </a>
@@ -59,7 +59,7 @@
                 <i class="fas fa-chevron-down chevron"></i>
             </div>
             <div class="nav-section-content">
-                <a href="#" class="nav-item">
+                <a href="{% url 'holiday-list' %}" class="nav-item {% if 'holiday' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Holidays</span>
                 </a>

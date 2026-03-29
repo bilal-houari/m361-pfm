@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Edit Exam - PreSkool{% else %}Add Exam - PreSkool{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>{% if object %}Edit Exam{% else %}Add Exam{% endif %}</h2>
+        <p>{% if object %}Modify existing exam details.{% else %}Plan a new exam for a subject.{% endif %}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'exam-list' %}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label" for="id_name">Exam Name</label>
+            <input type="text" name="name" id="id_name" class="form-input" value="{{ form.name.value|default:'' }}" required placeholder="e.g. Midterm 1">
+            {% if form.name.errors %}<p class="alert alert-danger text-sm">{{ form.name.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="id_subject">Subject</label>
+            <select name="subject" id="id_subject" class="form-input" required>
+                {% for choice in form.subject.field.choices %}
+                    <option value="{{ choice.0 }}" {% if choice.0 == form.subject.value %}selected{% endif %}>{{ choice.1 }}</option>
+                {% endfor %}
+            </select>
+            {% if form.subject.errors %}<p class="alert alert-danger text-sm">{{ form.subject.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--spacing-unit) * 3);">
+            <div class="form-group">
+                <label class="form-label" for="id_date">Exam Date</label>
+                <input type="date" name="date" id="id_date" class="form-input" value="{{ form.date.value|date:'Y-m-d'|default:'' }}" required>
+                {% if form.date.errors %}<p class="alert alert-danger text-sm">{{ form.date.errors|striptags }}</p>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_max_marks">Max Marks</label>
+                <input type="number" name="max_marks" id="id_max_marks" class="form-input" value="{{ form.max_marks.value|default:100 }}" required>
+                {% if form.max_marks.errors %}<p class="alert alert-danger text-sm">{{ form.max_marks.errors|striptags }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-footer" style="margin-top: calc(var(--spacing-unit) * 2); border-top: var(--border-width) solid var(--border-color); padding-top: calc(var(--spacing-unit) * 3); display: flex; justify-content: flex-end; gap: var(--spacing-unit);">
+            <a href="{% url 'exam-list' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {% if object %}Save Changes{% else %}Add Exam{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -21,6 +21,12 @@
     transition: width 0.3s ease;
 }
 
+/* Prevent transition "jump" on initial page load */
+html:not(.sidemenu-ready) .sidebar,
+html:not(.sidemenu-ready) .main-wrapper {
+    transition: none !important;
+}
+
 .collapsed .sidebar {
     width: var(--sidebar-collapsed-width);
 }
@@ -84,7 +90,7 @@
     transition: all 0.2s ease;
 }
 
-.collapsed .nav-section-title span, 
+.collapsed .nav-section-title span,
 .collapsed .nav-section-title .chevron {
     display: none;
 }
@@ -125,7 +131,7 @@
     color: var(--text-muted);
     transition: all 0.2s ease;
     text-decoration: none;
-    gap: 12px; /* Fixed: icons too close to titles. */
+    gap: 12px;
 }
 
 .nav-item i {
@@ -148,7 +154,8 @@
     display: none;
 }
 
-.nav-item:hover, .nav-item.active {
+.nav-item:hover,
+.nav-item.active {
     background-color: var(--bg-gray);
     color: var(--primary-color);
 }

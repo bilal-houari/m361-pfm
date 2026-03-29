@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Departments - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Departments</h2>
+        <p>Manage school departments and their descriptions.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'department-add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Department
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for department in departments %}
+            <tr>
+                <td>#{{ department.id }}</td>
+                <td class="font-weight-bold">{{ department.name }}</td>
+                <td class="text-muted">{{ department.description|truncatewords:10|default:"No description" }}</td>
+                <td style="text-align: right;">
+                    <a href="{% url 'department-edit' department.pk %}" class="btn btn-sm btn-outline" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="javascript:void(0)" 
+                       data-url="{% url 'department-delete' department.pk %}"
+                       data-name="the department: {{ department.name }}"
+                       onclick="openDeleteModal(this.dataset.url, this.dataset.name)"
+                       class="btn btn-sm btn-outline" 
+                       title="Delete" 
+                       style="color: #dc3545;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="table-empty">
+                    <i class="fas fa-building"></i>
+                    <p>No departments found. <a href="{% url 'department-add' %}">Add one now</a>.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
