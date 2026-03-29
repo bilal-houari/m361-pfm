@@ -20,7 +20,6 @@ class StudentService(BaseService):
     def create_student(cls, user_data, student_data):
         # 1. Create User via UserService
         user = UserService.create_user(
-            username=user_data.get('username'),
             password=user_data.get('password'),
             email=user_data.get('email'),
             first_name=user_data.get('first_name'),

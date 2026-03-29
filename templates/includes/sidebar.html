@@ -1,0 +1,73 @@
+{% load static %}
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <img src="{% static 'img/logo.png' %}" alt="PreSkool Logo" class="sidebar-logo">
+        <span class="sidebar-title">PreSkool</span>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="/" class="nav-item active">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+        </a>
+
+        {% if user.role == 'ADMIN' %}
+        <div class="nav-section" id="mgmt-section">
+            <div class="nav-section-title" onclick="toggleSection('mgmt-section')">
+                <span>Management</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-section-content">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Teachers</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-building"></i>
+                    <span>Departments</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    <span>Subjects</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if user.role == 'TEACHER' or user.role == 'ADMIN' %}
+        <div class="nav-section" id="acad-section">
+            <div class="nav-section-title" onclick="toggleSection('acad-section')">
+                <span>Academic</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-section-content">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Exams</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="nav-section" id="settings-section">
+            <div class="nav-section-title" onclick="toggleSection('settings-section')">
+                <span>General</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-section-content">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Holidays</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+</aside>

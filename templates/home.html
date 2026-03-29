@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | PreSkool{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <h1>Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+    <p class="text-muted">You are logged in as a <strong>{{ user.get_role_display }}</strong>.</p>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card placeholder-card">
+        <h3>Overview</h3>
+        <p>Dashboard statistics will appear here.</p>
+    </div>
+    <div class="card placeholder-card">
+        <h3>Recent Activity</h3>
+        <p>Recent school updates will appear here.</p>
+    </div>
+</div>
+
+<style>
+    .welcome-section {
+        margin-bottom: calc(var(--spacing-unit) * 4);
+    }
+    .welcome-section h1 {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-unit);
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: calc(var(--spacing-unit) * 3);
+    }
+    .card {
+        background: var(--bg-light);
+        border: var(--border-width) solid var(--border-color);
+        padding: calc(var(--spacing-unit) * 3);
+        border-radius: var(--border-radius);
+    }
+    .card h3 {
+        margin-bottom: var(--spacing-unit);
+        color: var(--primary-color);
+    }
+    .placeholder-card {
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        border-style: dashed;
+    }
+</style>
+{% endblock %}

@@ -7,7 +7,9 @@ class UserService(BaseService):
     model = User
 
     @classmethod
-    def create_user(cls, username, password, email, first_name, last_name, role):
+    def create_user(cls, password, email, first_name, last_name, role, username=None):
+        if not username:
+            username = email
         user = User.objects.create_user(
             username=username,
             password=password,

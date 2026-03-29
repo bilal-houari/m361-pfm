@@ -1,0 +1,52 @@
+<header class="topbar">
+    <div class="topbar-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="breadcrumb">
+            <span class="text-muted">Home</span>
+            <i class="fas fa-chevron-right mx-2" style="font-size: 0.7rem; margin: 0 8px;"></i>
+            <span class="font-weight-bold">Dashboard</span>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <div class="user-menu">
+            <div class="user-info">
+                <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                <span class="user-role-badge badge">{{ user.get_role_display }}</span>
+            </div>
+        </div>
+    </div>
+</header>
+<style>
+    .user-menu {
+        display: flex;
+        align-items: center;
+        gap: calc(var(--spacing-unit) * 1.5);
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .mr-3 {
+        margin-right: 12px;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 1px 6px;
+        background-color: var(--bg-gray);
+        border: 1px solid var(--border-color);
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--primary-color);
+        border-radius: 2px;
+    }
+</style>
