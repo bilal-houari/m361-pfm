@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard | PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Dashboard</h2>
+        <p>Welcome back, <strong>{{ user.first_name }}</strong>! Status: {{ student.grade }}</p>
+    </div>
+</div>
+
+<!-- Standard Dashboard Grid -->
+<div class="dashboard-grid">
+    <!-- Stat: Average -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
+        <p class="text-muted font-weight-bold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05rem; margin-bottom: var(--spacing-unit);">Overall Average</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-size: 2rem; color: var(--text-dark);">{{ overall_avg|floatformat:1 }}%</h2>
+            <div style="background: #eff6ff; color: #3b82f6; width: 42px; height: 42px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat: Next Exam -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
+        <p class="text-muted font-weight-bold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05rem; margin-bottom: var(--spacing-unit);">Next Exam</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                {% if upcoming_exam %}
+                <h3 style="font-size: 1rem; margin: 0; color: var(--text-dark);">{{ upcoming_exam.subject.name }}</h3>
+                <p class="text-muted" style="font-size: 0.8rem;">{{ upcoming_exam.date|date:"M d, Y" }}</p>
+                {% else %}
+                <p class="text-muted" style="font-size: 0.9rem;">None scheduled</p>
+                {% endif %}
+            </div>
+            <div style="background: #fff7ed; color: #f97316; width: 42px; height: 42px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat: Next Holiday -->
+    <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
+        <p class="text-muted font-weight-bold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05rem; margin-bottom: var(--spacing-unit);">Upcoming Break</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                {% if next_holiday %}
+                <h3 style="font-size: 1rem; margin: 0; color: var(--text-dark);">{{ next_holiday.name }}</h3>
+                <p class="text-muted" style="font-size: 0.8rem;">Starts {{ next_holiday.start_date|date:"M d" }}</p>
+                {% else %}
+                <p class="text-muted" style="font-size: 0.9rem;">No upcoming breaks</p>
+                {% endif %}
+            </div>
+            <div style="background: #f0fdf4; color: #22c55e; width: 42px; height: 42px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                <i class="fas fa-umbrella-beach"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; margin-top: calc(var(--spacing-unit) * 4); align-items: start;">
+    <!-- Recent Results Table -->
+    <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="padding: calc(var(--spacing-unit) * 3); border-bottom: var(--border-width) solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem; margin: 0; color: var(--text-dark);">Recent Exam Results</h3>
+            <a href="{% url 'student-results' %}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="table-container" style="border: none; border-radius: 0;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="padding-left: calc(var(--spacing-unit) * 3);">Exam</th>
+                        <th>Subject</th>
+                        <th style="padding-right: calc(var(--spacing-unit) * 3); text-align: right;">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in recent_results %}
+                    <tr>
+                        <td style="padding-left: calc(var(--spacing-unit) * 3);"><strong>{{ result.exam.name }}</strong></td>
+                        <td>{{ result.exam.subject.name }}</td>
+                        <td style="padding-right: calc(var(--spacing-unit) * 3); text-align: right;">
+                            <span class="badge {% if result.percentage >= 50 %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ result.marks_obtained|floatformat:0 }} / {{ result.exam.max_marks }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="table-empty">
+                            <i class="fas fa-clipboard-list"></i>
+                            <p>No results yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card">
+        <h3 style="font-size: 1rem; margin-bottom: calc(var(--spacing-unit) * 2);">Academic Info</h3>
+        <p class="text-muted" style="font-size: 0.85rem; margin-bottom: calc(var(--spacing-unit) * 2);">Current enrollment status:</p>
+        <div style="background: var(--bg-gray); padding: calc(var(--spacing-unit) * 2); border: var(--border-width) solid var(--border-color); text-align: center; margin-bottom: calc(var(--spacing-unit) * 3);">
+            <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">{{ student.grade }}</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: var(--spacing-unit);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; padding-bottom: var(--spacing-unit); border-bottom: var(--border-width) dashed var(--border-color);">
+                <span class="text-muted">Admission No:</span>
+                <span class="font-weight-bold">{{ student.admission_number }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                <span class="text-muted">Student ID:</span>
+                <span class="font-weight-bold">#{{ student.id }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

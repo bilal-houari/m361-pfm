@@ -8,3 +8,8 @@ class Holiday(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.start_date})"
+
+    @property
+    def duration(self):
+        diff = self.end_date - self.start_date
+        return diff.days + 1

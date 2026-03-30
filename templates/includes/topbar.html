@@ -10,10 +10,13 @@
             <div class="user-info">
                 <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
             </div>
-            <a href="{% url 'logout' %}" class="btn btn-sm btn-outline btn-signout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sign Out</span>
-            </a>
+            <form action="{% url 'logout' %}" method="post" id="logout-form" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline btn-signout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sign Out</span>
+                </button>
+            </form>
         </div>
     </div>
 </header>

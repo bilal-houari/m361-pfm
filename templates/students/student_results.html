@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}My Results | PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>My Exam Results</h2>
+        <p>A full list of all your exam results and grades.</p>
+    </div>
+</div>
+
+<div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Exam Name</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th>Marks Obtained</th>
+                    <th>Max Marks</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td><strong>{{ result.exam.name }}</strong></td>
+                    <td>{{ result.exam.subject.name }}</td>
+                    <td>{{ result.exam.date|date:"M d, Y" }}</td>
+                    <td>{{ result.marks_obtained }}</td>
+                    <td>{{ result.exam.max_marks }}</td>
+                    <td>{{ result.percentage|floatformat:1 }}%</td>
+                    <td>
+                        {% if result.percentage >= 50 %}
+                        <span class="badge badge-success">Pass</span>
+                        {% else %}
+                        <span class="badge badge-danger">Fail</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="table-empty">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No results found for your account.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

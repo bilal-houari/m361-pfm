@@ -18,3 +18,9 @@ class ExamResult(models.Model):
     
     def __str__(self):
         return f"{self.student.user.get_full_name()} - {self.exam.name}: {self.marks_obtained}"
+
+    @property
+    def percentage(self):
+        if self.exam.max_marks > 0:
+            return (self.marks_obtained / self.exam.max_marks) * 100
+        return 0

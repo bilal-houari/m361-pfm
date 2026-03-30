@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}School Holidays | PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>School Holidays</h2>
+        <p>Plan your schedule according to the official school holidays.</p>
+    </div>
+</div>
+
+<div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Holiday Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Duration</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for holiday in holidays %}
+                <tr>
+                    <td><strong>{{ holiday.name }}</strong></td>
+                    <td>{{ holiday.start_date|date:"F d, Y" }}</td>
+                    <td>{{ holiday.end_date|date:"F d, Y" }}</td>
+                    <td>{{ holiday.duration }} {% if holiday.duration == 1 %}Day{% else %}Days{% endif %}</td>
+                    <td>{{ holiday.description|truncatewords:20 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="table-empty">
+                        <i class="fas fa-umbrella-beach"></i>
+                        <p>No upcoming holidays found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -6,10 +6,29 @@
     </div>
 
     <nav class="sidebar-nav">
-        <a href="/" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+        <a href="{% if user.role == 'STUDENT' %}{% url 'student-dashboard' %}{% else %}/{% endif %}" class="nav-item {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'student-dashboard' %}active{% endif %}">
             <i class="fas fa-th-large"></i>
             <span>Dashboard</span>
         </a>
+
+        {% if user.role == 'STUDENT' %}
+        <div class="nav-section" id="student-section">
+            <div class="nav-section-title" onclick="toggleSection('student-section')">
+                <span>My Academic</span>
+                <i class="fas fa-chevron-down chevron"></i>
+            </div>
+            <div class="nav-section-content">
+                <a href="{% url 'student-results' %}" class="nav-item {% if request.resolver_match.url_name == 'student-results' %}active{% endif %}">
+                    <i class="fas fa-award"></i>
+                    <span>Exam Results</span>
+                </a>
+                <a href="{% url 'student-holidays' %}" class="nav-item {% if request.resolver_match.url_name == 'student-holidays' %}active{% endif %}">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <span>School Holidays</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
 
         {% if user.role == 'ADMIN' %}
         <div class="nav-section" id="mgmt-section">
@@ -53,6 +72,7 @@
         </div>
         {% endif %}
 
+        {% if user.role != 'STUDENT' %}
         <div class="nav-section" id="settings-section">
             <div class="nav-section-title" onclick="toggleSection('settings-section')">
                 <span>General</span>
@@ -65,5 +85,6 @@
                 </a>
             </div>
         </div>
+        {% endif %}
     </nav>
 </aside>
