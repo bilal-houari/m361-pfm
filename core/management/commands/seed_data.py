@@ -52,7 +52,7 @@ class Command(BaseCommand):
                 phone_number=fake.phone_number()[:15],
                 address=fake.address()
             )
-            self.stdout.write('  - Admin created')
+            self.stdout.write('  - Admin (Superuser) created')
 
     def create_departments(self):
         dept_names = ['Mathematics', 'Science', 'Languages', 'Arts', 'Physical Education', 'Computer Science']
@@ -68,20 +68,35 @@ class Command(BaseCommand):
 
     def create_teachers(self, departments):
         teachers = []
-        for _ in range(12):
+        # Main Teacher
+        main_teacher_email = 'teacher@preskool.com'
+        main_user = CustomUser.objects.create_user(
+            email=main_teacher_email,
+            username=main_teacher_email,
+            password='password',
+            first_name='Main',
+            last_name='Teacher',
+            role='TEACHER'
+        )
+        main_teacher = Teacher.objects.create(
+            user=main_user,
+            date_of_birth=fake.date_of_birth(minimum_age=30, maximum_age=50),
+            specialization='General Education',
+            address=fake.address(),
+            phone_number=fake.phone_number()[:15]
+        )
+        teachers.append(main_teacher)
+
+        for _ in range(11):
             email = fake.unique.email()
-            first_name = fake.first_name()
-            last_name = fake.last_name()
-            
             user = CustomUser.objects.create_user(
                 email=email,
                 username=email,
                 password='password',
-                first_name=first_name,
-                last_name=last_name,
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
                 role='TEACHER'
             )
-            
             teacher = Teacher.objects.create(
                 user=user,
                 date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=60),
@@ -90,7 +105,7 @@ class Command(BaseCommand):
                 phone_number=fake.phone_number()[:15]
             )
             teachers.append(teacher)
-        self.stdout.write(f'  - {len(teachers)} Teachers created')
+        self.stdout.write(f'  - {len(teachers)} Teachers created (including teacher@preskool.com)')
         return teachers
 
     def create_subjects(self, departments, teachers):
@@ -104,6 +119,8 @@ class Command(BaseCommand):
             'Computer Science': ['Programming', 'Networking', 'Web Dev']
         }
         
+        main_teacher = next(t for t in teachers if t.user.email == 'teacher@preskool.com')
+        
         for dept in departments:
             names = subject_data.get(dept.name, [f"{dept.name} 101"])
             for name in names:
@@ -113,32 +130,52 @@ class Command(BaseCommand):
                     code=code,
                     department=dept
                 )
-                # Assign 1-2 random teachers to each subject
+                
+                # Assign main teacher to at least 4 subjects across different departments
+                if len(subjects) % 4 == 0:
+                    subject.teachers.add(main_teacher)
+                
                 assigned_teachers = random.sample(teachers, k=random.randint(1, 2))
-                subject.teachers.set(assigned_teachers)
+                subject.teachers.add(*assigned_teachers)
                 subjects.append(subject)
         
-        self.stdout.write(f'  - {len(subjects)} Subjects created')
+        self.stdout.write(f'  - {len(subjects)} Subjects created (teacher@preskool.com assigned to several)')
         return subjects
 
     def create_students(self):
         students = []
         grades = [f"Grade {i}" for i in range(1, 11)]
         
-        for _ in range(60):
+        # Main Student
+        main_student_email = 'student@preskool.com'
+        main_user = CustomUser.objects.create_user(
+            email=main_student_email,
+            username=main_student_email,
+            password='password',
+            first_name='Main',
+            last_name='Student',
+            role='STUDENT'
+        )
+        main_student = Student.objects.create(
+            user=main_user,
+            admission_number='ADM10001',
+            date_of_birth=fake.date_of_birth(minimum_age=12, maximum_age=15),
+            grade='Grade 8',
+            address=fake.address(),
+            phone_number=fake.phone_number()[:15]
+        )
+        students.append(main_student)
+
+        for _ in range(59):
             email = fake.unique.email()
-            first_name = fake.first_name()
-            last_name = fake.last_name()
-            
             user = CustomUser.objects.create_user(
                 email=email,
                 username=email,
                 password='password',
-                first_name=first_name,
-                last_name=last_name,
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
                 role='STUDENT'
             )
-            
             student = Student.objects.create(
                 user=user,
                 admission_number=f"ADM{fake.unique.random_number(digits=5)}",
@@ -149,7 +186,7 @@ class Command(BaseCommand):
             )
             students.append(student)
         
-        self.stdout.write(f'  - {len(students)} Students created')
+        self.stdout.write(f'  - {len(students)} Students created (including student@preskool.com)')
         return students
 
     def create_holidays(self):
@@ -170,12 +207,14 @@ class Command(BaseCommand):
         exam_names = ['Mid-Term Exam', 'Final Exam', 'Monthly Quiz']
         today = timezone.now().date()
         
+        main_student = next(s for s in students if s.user.email == 'student@preskool.com')
+        
         exam_count = 0
         result_count = 0
         
         # Create some exams for random subjects
         for exam_name in exam_names:
-            sampled_subjects = random.sample(subjects, k=random.randint(3, 5))
+            sampled_subjects = subjects # Create exams for ALL subjects for variety
             for subject in sampled_subjects:
                 exam = Exam.objects.create(
                     name=f"{exam_name} - {subject.name}",
@@ -185,14 +224,23 @@ class Command(BaseCommand):
                 )
                 exam_count += 1
                 
-                # Assign results to 15-20 random students
-                sampled_students = random.sample(students, k=random.randint(15, 20))
+                # Always assign a result to the main student
+                ExamResult.objects.create(
+                    exam=exam,
+                    student=main_student,
+                    marks_obtained=random.uniform(exam.max_marks * 0.5, exam.max_marks) # Always passing
+                )
+                result_count += 1
+                
+                # Assign results to 15-20 other random students
+                other_students = [s for s in students if s != main_student]
+                sampled_students = random.sample(other_students, k=random.randint(10, 15))
                 for student in sampled_students:
                     ExamResult.objects.create(
                         exam=exam,
                         student=student,
-                        marks_obtained=random.uniform(exam.max_marks * 0.4, exam.max_marks) # Pass marks or better
+                        marks_obtained=random.uniform(exam.max_marks * 0.3, exam.max_marks)
                     )
                     result_count += 1
                     
-        self.stdout.write(f'  - {exam_count} Exams and {result_count} Exam Results created')
+        self.stdout.write(f'  - {exam_count} Exams and {result_count} Exam Results created (student@preskool.com has all results)')
