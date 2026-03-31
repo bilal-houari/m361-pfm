@@ -34,9 +34,10 @@ class ExamResultEntryView(AdminRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         exam = get_object_or_404(Exam, pk=self.kwargs['pk'])
         context['exam'] = exam
-        # Get all students and their existing results for this exam
+        # Get existing results for this exam
         results = {r.student_id: r.marks_obtained for r in ExamResult.objects.filter(exam=exam)}
-        students = Student.objects.all().select_related('user')
+        # Only get students belonging to the class concerned by the exam
+        students = Student.objects.filter(school_class=exam.school_class).select_related('user')
         
         student_list = []
         for student in students:
@@ -50,6 +51,10 @@ class ExamResultEntryView(AdminRequiredMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        # Admins should not be able to save marks
+        if request.user.role == 'ADMIN':
+            return redirect('exam-list')
+            
         exam = get_object_or_404(Exam, pk=self.kwargs['pk'])
         for key, value in request.POST.items():
             if key.startswith('marks_'):

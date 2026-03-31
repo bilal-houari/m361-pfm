@@ -85,7 +85,6 @@ class Command(BaseCommand):
         main_teacher = Teacher.objects.create(
             user=main_user,
             date_of_birth=fake.date_of_birth(minimum_age=30, maximum_age=50),
-            department=random.choice(departments),
             specialization='General Education',
             address=fake.address(),
             phone_number=fake.phone_number()[:15]
@@ -105,7 +104,6 @@ class Command(BaseCommand):
             teacher = Teacher.objects.create(
                 user=user,
                 date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=60),
-                department=random.choice(departments),
                 specialization=fake.job()[:100],
                 address=fake.address(),
                 phone_number=fake.phone_number()[:15]
@@ -126,7 +124,9 @@ class Command(BaseCommand):
         }
         
         main_teacher = next(t for t in teachers if t.user.email == 'teacher@preskool.com')
-        teachers_pool = [t for t in teachers if t != main_teacher]
+        
+        # Track which teachers have been assigned to subjects
+        unassigned_teachers = [t for t in teachers if t != main_teacher]
         
         for dept in departments:
             names = subject_data.get(dept.name, [f"{dept.name} 101"])
@@ -138,29 +138,22 @@ class Command(BaseCommand):
                     department=dept
                 )
                 
-                # Assign this subject to teachers who belong to this department
-                dept_teachers = [t for t in teachers if t.department == dept]
-                if not dept_teachers:
-                    dept_teachers = teachers # fallback
-                
                 # Each subject gets at least 1-2 teachers
-                assigned_count = 0
-                for teacher in dept_teachers:
-                    if teacher.subject is None:
+                # Assign unassigned teachers first
+                for _ in range(2):
+                    if unassigned_teachers:
+                        teacher = unassigned_teachers.pop(0)
                         teacher.subject = subject
                         teacher.save()
-                        assigned_count += 1
-                        if assigned_count >= 2: break
                 
                 subjects.append(subject)
         
-        # Ensure main teacher has a subject (e.g. from their department)
+        # Ensure main teacher has a subject
         if main_teacher.subject is None:
-            dept_subjects = [s for s in subjects if s.department == main_teacher.department]
-            main_teacher.subject = random.choice(dept_subjects) if dept_subjects else subjects[0]
+            main_teacher.subject = random.choice(subjects)
             main_teacher.save()
             
-        self.stdout.write(f'  - {len(subjects)} Subjects created and assigned to teachers')
+        self.stdout.write(f'  - {len(subjects)} Subjects created and teachers assigned')
         return subjects
 
     def create_classes(self, teachers, subjects):

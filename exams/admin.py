@@ -14,6 +14,15 @@ class ExamResultAdmin(admin.ModelAdmin):
     search_fields = ('student__user__first_name', 'student__user__last_name', 'exam__name')
     readonly_fields = ('marks_obtained',)
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     def get_exam_name(self, obj):
         return obj.exam.name
     get_exam_name.short_description = 'Exam'

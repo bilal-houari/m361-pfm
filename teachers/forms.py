@@ -13,10 +13,15 @@ class TeacherForm(forms.ModelForm):
 
     class Meta:
         model = Teacher
-        fields = ['date_of_birth', 'specialization', 'address', 'phone_number']
+        fields = ['date_of_birth', 'subject', 'specialization', 'address', 'phone_number']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name not in ['email', 'first_name', 'last_name', 'password']:
+                field.widget.attrs['class'] = 'form-input'
+            if field_name == 'specialization':
+                field.help_text = "e.g. Senior Math Teacher"
         if self.instance and self.instance.pk:
             self.fields['email'].initial = self.instance.user.email
             self.fields['first_name'].initial = self.instance.user.first_name

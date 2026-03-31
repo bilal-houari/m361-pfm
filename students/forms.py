@@ -13,10 +13,14 @@ class StudentForm(forms.ModelForm):
 
     class Meta:
         model = Student
-        fields = ['admission_number', 'date_of_birth', 'school_class', 'address', 'phone_number']
+        fields = ['date_of_birth', 'school_class', 'address', 'phone_number']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if field_name not in ['email', 'first_name', 'last_name', 'password']:
+                field.widget.attrs['class'] = 'form-input'
+        
         if self.instance and self.instance.pk:
             self.fields['email'].initial = self.instance.user.email
             self.fields['first_name'].initial = self.instance.user.first_name

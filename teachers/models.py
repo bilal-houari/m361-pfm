@@ -1,9 +1,11 @@
 from django.db import models
 from django.conf import settings
+import random
+import string
 
 class Teacher(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='teacher_profile')
-    department = models.ForeignKey('departments.Department', on_delete=models.CASCADE, related_name='teachers', null=True)
+    staff_id = models.CharField(max_length=20, unique=True, blank=True)
     subject = models.ForeignKey('subjects.Subject', on_delete=models.SET_NULL, null=True, related_name='teachers')
     date_of_birth = models.DateField()
     specialization = models.CharField(max_length=100)
@@ -12,4 +14,21 @@ class Teacher(models.Model):
     phone_number = models.CharField(max_length=15, blank=True)
 
     def __str__(self):
-        return f"{self.user.get_full_name()} ({self.specialization})"
+        return f"{self.user.get_full_name()} ({self.staff_id})"
+
+    @property
+    def department(self):
+        if self.subject:
+            return self.subject.department
+        return None
+
+    def save(self, *args, **kwargs):
+        if not self.staff_id:
+            random_suffix = ''.join(random.choices(string.digits, k=3))
+            self.staff_id = f"STAFF-{random_suffix}"
+            
+            while Teacher.objects.filter(staff_id=self.staff_id).exists():
+                random_suffix = ''.join(random.choices(string.digits, k=3))
+                self.staff_id = f"STAFF-{random_suffix}"
+        
+        super().save(*args, **kwargs)

@@ -40,7 +40,8 @@
                                    step="0.01" 
                                    min="0" 
                                    max="{{ exam.max_marks }}"
-                                   placeholder="Enter marks">
+                                   placeholder="Enter marks"
+                                   {% if user.role == 'ADMIN' %}readonly{% endif %}>
                         </td>
                     </tr>
                     {% empty %}
@@ -55,10 +56,12 @@
         </div>
 
         <div class="form-footer" style="display: flex; justify-content: flex-end; gap: var(--spacing-unit);">
-            <a href="{% url 'exam-list' %}" class="btn btn-outline">Cancel</a>
+            <a href="{% url 'exam-list' %}" class="btn btn-outline">{% if user.role == 'ADMIN' %}Close View{% else %}Cancel{% endif %}</a>
+            {% if user.role != 'ADMIN' %}
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Save All Results
             </button>
+            {% endif %}
         </div>
     </form>
 </div>

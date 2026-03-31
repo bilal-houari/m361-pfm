@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from core.mixins import AdminRequiredMixin
 from .models import Subject
+from .forms import SubjectForm
 
 class SubjectListView(AdminRequiredMixin, ListView):
     model = Subject
@@ -10,13 +11,13 @@ class SubjectListView(AdminRequiredMixin, ListView):
 
 class SubjectCreateView(AdminRequiredMixin, CreateView):
     model = Subject
-    fields = ['name', 'code', 'department', 'teachers']
+    form_class = SubjectForm
     template_name = 'subjects/subject_form.html'
     success_url = reverse_lazy('subject-list')
 
 class SubjectUpdateView(AdminRequiredMixin, UpdateView):
     model = Subject
-    fields = ['name', 'code', 'department', 'teachers']
+    form_class = SubjectForm
     template_name = 'subjects/subject_form.html'
     success_url = reverse_lazy('subject-list')
 

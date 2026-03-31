@@ -33,7 +33,7 @@
                 <td>
                     <span class="font-weight-bold">{{ student.user.get_full_name }}</span>
                 </td>
-                <td>{{ student.grade }}</td>
+                <td>{{ student.school_class.name }}</td>
                 <td class="text-muted">{{ student.user.email }}</td>
                 <td style="text-align: right;">
                     <a href="{% url 'student-edit' student.pk %}" class="btn btn-sm btn-outline" title="Edit">
