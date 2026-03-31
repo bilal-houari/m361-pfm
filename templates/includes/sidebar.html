@@ -18,9 +18,21 @@
                 <i class="fas fa-chevron-down chevron"></i>
             </div>
             <div class="nav-section-content">
+                <a href="{% url 'student-dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student-dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'exam-list' %}" class="nav-item {% if request.resolver_match.url_name == 'exam-list' %}active{% endif %}">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Exams Schedule</span>
+                </a>
                 <a href="{% url 'student-results' %}" class="nav-item {% if request.resolver_match.url_name == 'student-results' %}active{% endif %}">
                     <i class="fas fa-award"></i>
-                    <span>Exam Results</span>
+                    <span>My Results</span>
+                </a>
+                <a href="{% url 'student-class-list' %}" class="nav-item {% if request.resolver_match.url_name == 'student-class-list' %}active{% endif %}">
+                    <i class="fas fa-user-friends"></i>
+                    <span>My Classmates</span>
                 </a>
                 <a href="{% url 'student-holidays' %}" class="nav-item {% if request.resolver_match.url_name == 'student-holidays' %}active{% endif %}">
                     <i class="fas fa-umbrella-beach"></i>

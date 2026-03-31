@@ -6,12 +6,14 @@
 <div class="page-header">
     <div class="page-title">
         <h2>Exams Schedule</h2>
-        <p>Plan exams and manage student results.</p>
+        <p>{% if user.role == 'STUDENT' %}Your upcoming examination schedule for {{ user.student_profile.school_class.name }}.{% else %}Plan exams and manage student results.{% endif %}</p>
     </div>
     <div class="page-actions">
+        {% if user.role != 'STUDENT' %}
         <a href="{% url 'exam-add' %}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Add Exam
         </a>
+        {% endif %}
     </div>
 </div>
 
@@ -34,6 +36,7 @@
                 <td>{{ exam.date|date:"M d, Y" }}</td>
                 <td>{{ exam.max_marks }}</td>
                 <td style="text-align: right;">
+                    {% if user.role != 'STUDENT' %}
                     <a href="{% url 'exam-results' exam.pk %}" class="btn btn-sm btn-outline" title="Results" style="color: var(--primary-color);">
                         <i class="fas fa-list-check"></i> Results
                     </a>
@@ -49,6 +52,9 @@
                        style="color: #dc3545;">
                         <i class="fas fa-trash"></i>
                     </a>
+                    {% else %}
+                    <span class="text-muted text-sm">Schedule View Only</span>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

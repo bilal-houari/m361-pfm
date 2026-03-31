@@ -5,10 +5,21 @@ from core.mixins import AdminRequiredMixin
 from .models import Exam, ExamResult
 from students.models import Student
 
-class ExamListView(AdminRequiredMixin, ListView):
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class ExamListView(LoginRequiredMixin, ListView):
     model = Exam
     template_name = 'exams/exam_list.html'
     context_object_name = 'exams'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.role == 'STUDENT':
+            student = getattr(self.request.user, 'student_profile', None)
+            if student and student.school_class:
+                return queryset.filter(school_class=student.school_class)
+            return queryset.none()
+        return queryset
 
 class ExamCreateView(AdminRequiredMixin, CreateView):
     model = Exam

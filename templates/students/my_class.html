@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}My Classmates - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>My Classmates</h2>
+        <p>Your peers in {{ school_class.name }}</p>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Adm. No</th>
+                <th>Student Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classmate in classmates %}
+            <tr>
+                <td><span class="badge">{{ classmate.admission_number }}</span></td>
+                <td>
+                    <span class="font-weight-bold">{{ classmate.user.get_full_name }}</span>
+                </td>
+                <td class="text-muted">{{ classmate.user.email }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="table-empty">
+                    <i class="fas fa-user-friends"></i>
+                    <p>You are the only student currently enrolled in this class.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

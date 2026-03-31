@@ -75,3 +75,17 @@ class StudentHolidayListView(StudentRequiredMixin, ListView):
 
     def get_queryset(self):
         return Holiday.objects.filter(start_date__gte=timezone.now().date()).order_by('start_date')
+
+class StudentClassListView(StudentRequiredMixin, ListView):
+    model = Student
+    template_name = 'students/my_class.html'
+    context_object_name = 'classmates'
+
+    def get_queryset(self):
+        student = self.request.user.student_profile
+        return Student.objects.filter(school_class=student.school_class).exclude(id=student.id).select_related('user')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['school_class'] = self.request.user.student_profile.school_class
+        return context
