@@ -38,6 +38,7 @@ class StudentDashboardView(StudentRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         student = self.request.user.student_profile
+        school_class = student.school_class
         
         # Latest 3 results
         results = ExamResult.objects.filter(student=student).order_by('-exam__date')
@@ -46,13 +47,17 @@ class StudentDashboardView(StudentRequiredMixin, TemplateView):
         # Overall Average
         context['overall_avg'] = results.aggregate(Avg('marks_obtained'))['marks_obtained__avg'] or 0
         
-        # Upcoming Exam
-        context['upcoming_exam'] = Exam.objects.filter(date__gte=timezone.now().date()).order_by('date').first()
+        # Upcoming Exam for student's CLASS
+        exams = Exam.objects.filter(date__gte=timezone.now().date())
+        if school_class:
+            exams = exams.filter(school_class=school_class)
+        context['upcoming_exam'] = exams.order_by('date').first()
         
         # Next Holiday
         context['next_holiday'] = Holiday.objects.filter(start_date__gte=timezone.now().date()).order_by('start_date').first()
         
         context['student'] = student
+        context['school_class'] = school_class
         return context
 
 class StudentExamResultsView(StudentRequiredMixin, ListView):

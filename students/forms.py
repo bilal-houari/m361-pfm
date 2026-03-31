@@ -13,7 +13,7 @@ class StudentForm(forms.ModelForm):
 
     class Meta:
         model = Student
-        fields = ['admission_number', 'date_of_birth', 'grade', 'address', 'phone_number']
+        fields = ['admission_number', 'date_of_birth', 'school_class', 'address', 'phone_number']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

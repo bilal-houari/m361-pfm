@@ -3,7 +3,7 @@ from .models import Student
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('admission_number', 'get_student_name', 'grade', 'enrollment_date')
+    list_display = ('admission_number', 'get_student_name', 'school_class', 'enrollment_date')
     search_fields = ('admission_number', 'user__first_name', 'user__last_name')
 
     def get_student_name(self, obj):

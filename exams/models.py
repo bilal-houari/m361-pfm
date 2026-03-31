@@ -6,6 +6,7 @@ class Exam(models.Model):
     name = models.CharField(max_length=100)
     date = models.DateField()
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='exams')
+    school_class = models.ForeignKey('classes.SchoolClass', on_delete=models.CASCADE, related_name='exams', null=True)
     max_marks = models.IntegerField(default=100)
 
     def __str__(self):

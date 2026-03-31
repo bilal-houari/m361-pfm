@@ -7,8 +7,8 @@ class StudentService(BaseService):
     model = Student
 
     @classmethod
-    def get_by_grade(cls, grade):
-        return cls.model.objects.filter(grade=grade).select_related('user')
+    def get_by_class(cls, class_id):
+        return cls.model.objects.filter(school_class_id=class_id).select_related('user')
 
     @classmethod
     def get_academic_history(cls, student_id):

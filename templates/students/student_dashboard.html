@@ -7,7 +7,7 @@
 <div class="page-header">
     <div class="page-title">
         <h2>Dashboard</h2>
-        <p>Welcome back, <strong>{{ user.first_name }}</strong>! Status: {{ student.grade }}</p>
+        <p>Welcome back, <strong>{{ user.first_name }}</strong>! Class: {{ school_class.name|default:"Not Assigned" }}</p>
     </div>
 </div>
 
@@ -106,7 +106,7 @@
         <h3 style="font-size: 1rem; margin-bottom: calc(var(--spacing-unit) * 2);">Academic Info</h3>
         <p class="text-muted" style="font-size: 0.85rem; margin-bottom: calc(var(--spacing-unit) * 2);">Current enrollment status:</p>
         <div style="background: var(--bg-gray); padding: calc(var(--spacing-unit) * 2); border: var(--border-width) solid var(--border-color); text-align: center; margin-bottom: calc(var(--spacing-unit) * 3);">
-            <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">{{ student.grade }}</span>
+            <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">{{ school_class.name|default:"-" }}</span>
         </div>
         <div style="display: flex; flex-direction: column; gap: var(--spacing-unit);">
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; padding-bottom: var(--spacing-unit); border-bottom: var(--border-width) dashed var(--border-color);">

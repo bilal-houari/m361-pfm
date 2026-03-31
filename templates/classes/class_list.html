@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Classes - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Classes</h2>
+        <p>Manage school classes and grade levels.</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'class-add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Class
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Class Name</th>
+                <th>Grade Level</th>
+                <th>Students</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for school_class in classes %}
+            <tr>
+                <td>
+                    <a href="{% url 'class-detail' school_class.pk %}" class="font-weight-bold">
+                        {{ school_class.name }}
+                    </a>
+                </td>
+                <td><span class="badge">Level {{ school_class.grade_level }}</span></td>
+                <td>{{ school_class.student_count }} Students</td>
+                <td style="text-align: right;">
+                    <a href="{% url 'class-edit' school_class.pk %}" class="btn btn-sm btn-outline" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'class-delete' school_class.pk %}" class="btn btn-sm btn-outline" title="Delete" style="color: #dc3545;">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="table-empty">
+                    <i class="fas fa-chalkboard"></i>
+                    <p>No classes found. <a href="{% url 'class-add' %}">Add one now</a>.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

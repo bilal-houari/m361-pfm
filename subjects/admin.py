@@ -5,4 +5,3 @@ from .models import Subject
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'department')
     search_fields = ('name', 'code')
-    filter_horizontal = ('teachers',)

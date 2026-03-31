@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Class Details - {{ school_class.name }} - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>{{ school_class.name }}</h2>
+        <p>Grade Level: {{ school_class.grade_level }}</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'class-edit' school_class.pk %}" class="btn btn-outline">
+            <i class="fas fa-edit"></i> Edit Class
+        </a>
+        <a href="{% url 'class-list' %}" class="btn btn-outline">
+             Back to List
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; align-items: start;">
+    <!-- Assignments (Subjects & Teachers) -->
+    <div class="card p-0 overflow-hidden">
+        <div style="padding: calc(var(--spacing-unit) * 3); border-bottom: var(--border-width) solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem; margin: 0;">Subjects & Teachers</h3>
+            <button onclick="toggleAssignmentForm()" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus"></i> Assign
+            </button>
+        </div>
+        
+        <!-- Assignment Form (Hidden by default) -->
+        <div id="assignmentForm" style="display: none; padding: calc(var(--spacing-unit) * 3); background: var(--bg-gray); border-bottom: var(--border-width) solid var(--border-color);">
+            <form action="{% url 'class-assign' school_class.pk %}" method="post" style="display: flex; flex-direction: column; gap: 1rem;">
+                {% csrf_token %}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="font-size: 0.75rem;">Subject</label>
+                        <select name="subject" class="form-input" required>
+                            {% for subject in all_subjects %}
+                                <option value="{{ subject.pk }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="font-size: 0.75rem;">Teacher</label>
+                        <select name="teacher" class="form-input" required>
+                            {% for teacher in all_teachers %}
+                                <option value="{{ teacher.pk }}">{{ teacher.user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                    <button type="button" onclick="toggleAssignmentForm()" class="btn btn-sm btn-outline">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save Assignment</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container" style="border: none; border-radius: 0;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="padding-left: calc(var(--spacing-unit) * 3);">Subject</th>
+                        <th>Instructor</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                    <tr>
+                        <td style="padding-left: calc(var(--spacing-unit) * 3);">
+                            <span class="font-weight-bold">{{ assignment.subject.name }}</span>
+                        </td>
+                        <td>{{ assignment.teacher.user.get_full_name }}</td>
+                        <td style="text-align: right;">
+                            <form action="{% url 'assignment-delete' assignment.pk %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline" style="color: #dc3545;" title="Remove Subject">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="table-empty">
+                            No subjects assigned to this class yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Students in Class -->
+    <div class="card p-0 overflow-hidden">
+        <div style="padding: calc(var(--spacing-unit) * 3); border-bottom: var(--border-width) solid var(--border-color);">
+            <h3 style="font-size: 1rem; margin: 0;">Enrolled Students ({{ students.count }})</h3>
+        </div>
+        <div class="table-container" style="border: none; border-radius: 0;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="padding-left: calc(var(--spacing-unit) * 3);">Name</th>
+                        <th>Admission No</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td style="padding-left: calc(var(--spacing-unit) * 3);">
+                            <span class="font-weight-bold">{{ student.user.get_full_name }}</span>
+                        </td>
+                        <td><span class="badge">{{ student.admission_number }}</span></td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'student-edit' student.pk %}" class="btn btn-sm btn-outline">View Profile</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="table-empty">
+                            No students assigned to this class.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAssignmentForm() {
+    const form = document.getElementById('assignmentForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

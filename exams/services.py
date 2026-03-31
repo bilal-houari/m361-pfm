@@ -9,9 +9,12 @@ class ExamService(BaseService):
         return cls.model.objects.filter(subject_id=subject_id).order_by('-date')
 
     @classmethod
-    def get_upcoming_exams(cls, limit=5):
+    def get_upcoming_exams(cls, class_id=None, limit=5):
         from django.utils import timezone
-        return cls.model.objects.filter(date__gte=timezone.now().date()).order_by('date')[:limit]
+        queryset = cls.model.objects.filter(date__gte=timezone.now().date())
+        if class_id:
+            queryset = queryset.filter(school_class_id=class_id)
+        return queryset.order_by('date')[:limit]
 
 class ExamResultService(BaseService):
     model = ExamResult

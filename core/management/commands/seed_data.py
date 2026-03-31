@@ -13,6 +13,7 @@ from departments.models import Department
 from subjects.models import Subject
 from holidays.models import Holiday
 from exams.models import Exam, ExamResult
+from classes.models import SchoolClass, ClassSubjectAssignment
 
 fake = Faker()
 
@@ -28,13 +29,16 @@ class Command(BaseCommand):
                 departments = self.create_departments()
                 teachers = self.create_teachers(departments)
                 subjects = self.create_subjects(departments, teachers)
-                students = self.create_students()
+                classes = self.create_classes(teachers, subjects)
+                students = self.create_students(classes)
                 self.create_holidays()
-                self.create_exams_and_results(subjects, students)
+                self.create_exams_and_results(subjects, students, classes)
                 
             self.stdout.write(self.style.SUCCESS('Successfully seeded data'))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Seeding failed: {e}'))
+            import traceback
+            self.stdout.write(traceback.format_exc())
 
     def create_admin(self):
         admin_email = 'admin@preskool.com'
@@ -81,13 +85,14 @@ class Command(BaseCommand):
         main_teacher = Teacher.objects.create(
             user=main_user,
             date_of_birth=fake.date_of_birth(minimum_age=30, maximum_age=50),
+            department=random.choice(departments),
             specialization='General Education',
             address=fake.address(),
             phone_number=fake.phone_number()[:15]
         )
         teachers.append(main_teacher)
 
-        for _ in range(11):
+        for _ in range(29): # More teachers to cover all subjects
             email = fake.unique.email()
             user = CustomUser.objects.create_user(
                 email=email,
@@ -100,12 +105,13 @@ class Command(BaseCommand):
             teacher = Teacher.objects.create(
                 user=user,
                 date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=60),
+                department=random.choice(departments),
                 specialization=fake.job()[:100],
                 address=fake.address(),
                 phone_number=fake.phone_number()[:15]
             )
             teachers.append(teacher)
-        self.stdout.write(f'  - {len(teachers)} Teachers created (including teacher@preskool.com)')
+        self.stdout.write(f'  - {len(teachers)} Teachers created')
         return teachers
 
     def create_subjects(self, departments, teachers):
@@ -120,6 +126,7 @@ class Command(BaseCommand):
         }
         
         main_teacher = next(t for t in teachers if t.user.email == 'teacher@preskool.com')
+        teachers_pool = [t for t in teachers if t != main_teacher]
         
         for dept in departments:
             names = subject_data.get(dept.name, [f"{dept.name} 101"])
@@ -131,20 +138,73 @@ class Command(BaseCommand):
                     department=dept
                 )
                 
-                # Assign main teacher to at least 4 subjects across different departments
-                if len(subjects) % 4 == 0:
-                    subject.teachers.add(main_teacher)
+                # Assign this subject to teachers who belong to this department
+                dept_teachers = [t for t in teachers if t.department == dept]
+                if not dept_teachers:
+                    dept_teachers = teachers # fallback
                 
-                assigned_teachers = random.sample(teachers, k=random.randint(1, 2))
-                subject.teachers.add(*assigned_teachers)
+                # Each subject gets at least 1-2 teachers
+                assigned_count = 0
+                for teacher in dept_teachers:
+                    if teacher.subject is None:
+                        teacher.subject = subject
+                        teacher.save()
+                        assigned_count += 1
+                        if assigned_count >= 2: break
+                
                 subjects.append(subject)
         
-        self.stdout.write(f'  - {len(subjects)} Subjects created (teacher@preskool.com assigned to several)')
+        # Ensure main teacher has a subject (e.g. from their department)
+        if main_teacher.subject is None:
+            dept_subjects = [s for s in subjects if s.department == main_teacher.department]
+            main_teacher.subject = random.choice(dept_subjects) if dept_subjects else subjects[0]
+            main_teacher.save()
+            
+        self.stdout.write(f'  - {len(subjects)} Subjects created and assigned to teachers')
         return subjects
 
-    def create_students(self):
+    def create_classes(self, teachers, subjects):
+        classes = []
+        grade_levels = range(1, 11) # Grades 1-10
+        
+        main_teacher = next(t for t in teachers if t.user.email == 'teacher@preskool.com')
+        
+        for level in grade_levels:
+            name = f"Grade {level}"
+            school_class = SchoolClass.objects.create(
+                name=name,
+                grade_level=level
+            )
+            
+            # Pick 5-8 random subjects for this class
+            class_subjects = random.sample(subjects, k=random.randint(5, 8))
+            
+            # For each subject, assign ONE teacher
+            for subject in class_subjects:
+                # Filter teachers who actually teach this subject (if any)
+                subject_teachers = list(subject.teachers.all())
+                if not subject_teachers:
+                    subject_teachers = teachers # Fallback if no specific teacher is assigned to the subject itself
+                
+                teacher = random.choice(subject_teachers)
+                
+                # Make sure main teacher is assigned to something in Grade 8
+                if level == 8 and main_teacher in subject_teachers and not school_class.assignments.filter(teacher=main_teacher).exists():
+                    teacher = main_teacher
+
+                ClassSubjectAssignment.objects.create(
+                    school_class=school_class,
+                    subject=subject,
+                    teacher=teacher
+                )
+            
+            classes.append(school_class)
+        
+        self.stdout.write(f'  - {len(classes)} Classes created with subject assignments')
+        return classes
+
+    def create_students(self, classes):
         students = []
-        grades = [f"Grade {i}" for i in range(1, 11)]
         
         # Main Student
         main_student_email = 'student@preskool.com'
@@ -156,17 +216,20 @@ class Command(BaseCommand):
             last_name='Student',
             role='STUDENT'
         )
+        
+        # Grade 8 for main student
+        class_8 = next(c for c in classes if c.name == 'Grade 8')
         main_student = Student.objects.create(
             user=main_user,
             admission_number='ADM10001',
-            date_of_birth=fake.date_of_birth(minimum_age=12, maximum_age=15),
-            grade='Grade 8',
+            date_of_birth=fake.date_of_birth(minimum_age=13, maximum_age=14),
+            school_class=class_8,
             address=fake.address(),
             phone_number=fake.phone_number()[:15]
         )
         students.append(main_student)
 
-        for _ in range(59):
+        for _ in range(199): # Total students = 200
             email = fake.unique.email()
             user = CustomUser.objects.create_user(
                 email=email,
@@ -176,17 +239,21 @@ class Command(BaseCommand):
                 last_name=fake.last_name(),
                 role='STUDENT'
             )
+            
+            # Weighted random choice or just random choice for distribution
+            student_class = random.choice(classes)
+            
             student = Student.objects.create(
                 user=user,
                 admission_number=f"ADM{fake.unique.random_number(digits=5)}",
                 date_of_birth=fake.date_of_birth(minimum_age=6, maximum_age=17),
-                grade=random.choice(grades),
+                school_class=student_class,
                 address=fake.address(),
                 phone_number=fake.phone_number()[:15]
             )
             students.append(student)
         
-        self.stdout.write(f'  - {len(students)} Students created (including student@preskool.com)')
+        self.stdout.write(f'  - {len(students)} Students created (including student@preskool.com in {class_8.name})')
         return students
 
     def create_holidays(self):
@@ -203,7 +270,7 @@ class Command(BaseCommand):
             )
         self.stdout.write(f'  - {len(h_names)} Holidays created')
 
-    def create_exams_and_results(self, subjects, students):
+    def create_exams_and_results(self, subjects, students, classes):
         exam_names = ['Mid-Term Exam', 'Final Exam', 'Monthly Quiz']
         today = timezone.now().date()
         
@@ -212,35 +279,44 @@ class Command(BaseCommand):
         exam_count = 0
         result_count = 0
         
-        # Create some exams for random subjects
+    def create_exams_and_results(self, subjects, students, classes):
+        exam_names = ['Mid-Term Exam', 'Final Exam', 'Monthly Quiz']
+        today = timezone.now().date()
+        
+        exam_count = 0
+        result_count = 0
+        
         for exam_name in exam_names:
-            sampled_subjects = subjects # Create exams for ALL subjects for variety
-            for subject in sampled_subjects:
-                exam = Exam.objects.create(
-                    name=f"{exam_name} - {subject.name}",
-                    date=today - timedelta(days=random.randint(10, 60)), # Recent exams
-                    subject=subject,
-                    max_marks=random.choice([50, 100])
-                )
-                exam_count += 1
-                
-                # Always assign a result to the main student
-                ExamResult.objects.create(
-                    exam=exam,
-                    student=main_student,
-                    marks_obtained=random.uniform(exam.max_marks * 0.5, exam.max_marks) # Always passing
-                )
-                result_count += 1
-                
-                # Assign results to 15-20 other random students
-                other_students = [s for s in students if s != main_student]
-                sampled_students = random.sample(other_students, k=random.randint(10, 15))
-                for student in sampled_students:
-                    ExamResult.objects.create(
-                        exam=exam,
-                        student=student,
-                        marks_obtained=random.uniform(exam.max_marks * 0.3, exam.max_marks)
-                    )
-                    result_count += 1
+            # For each class, create exams for their assigned subjects
+            for school_class in classes:
+                # Use the new assignments model to get subjects
+                class_assignments = school_class.assignments.all()
+                if not class_assignments:
+                    continue
                     
-        self.stdout.write(f'  - {exam_count} Exams and {result_count} Exam Results created (student@preskool.com has all results)')
+                # Pick 2-3 subjects per class for this exam type
+                sampled_assignments = random.sample(list(class_assignments), k=min(len(class_assignments), 3))
+                
+                for assignment in sampled_assignments:
+                    exam = Exam.objects.create(
+                        name=f"{exam_name} - {assignment.subject.name}",
+                        date=today - timedelta(days=random.randint(10, 60)), # Recent exams
+                        subject=assignment.subject,
+                        school_class=school_class,
+                        max_marks=random.choice([50, 100])
+                    )
+                    exam_count += 1
+                    
+                    # Get students in THIS class
+                    class_students = [s for s in students if s.school_class == school_class]
+                    
+                    for student in class_students:
+                        # Record result for each student in the class
+                        ExamResult.objects.create(
+                            exam=exam,
+                            student=student,
+                            marks_obtained=random.uniform(exam.max_marks * 0.4, exam.max_marks)
+                        )
+                        result_count += 1
+                    
+        self.stdout.write(f'  - {exam_count} Exams and {result_count} Exam Results created (class-aware)')
