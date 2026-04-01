@@ -1,6 +1,11 @@
 # PreSkool Management System
 
-This project is a school management system developed with Django. It provides a centralized platform for managing institutional data, including student and teacher profiles, curriculum mapping, and academic performance tracking.
+> [!IMPORTANT]
+> **Implementation Note**: This project utilizes a custom-built user interface rather than the provided Bootstrap template. This decision was made due to the technical complexity and file redundancy of the original assets, as detailed in **Section IV.2 Mise en œuvre du frontend et contraintes de templates** of the project report.
+>
+> **Project Repositories:**
+> - **Part 1 (TP & Template Exploration)**: [m361/pfm-tp-guide](https://github.com/bilal-houari/m361/blob/main/pfm-tp-guide)
+> - **Part 2 (Final Implementation)**: [m361-pfm](https://github.com/bilal-houari/m361-pfm)
 
 ## Technical Stack
 - **Backend**: Django 6.x
