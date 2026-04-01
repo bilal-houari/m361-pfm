@@ -618,6 +618,8 @@ La mise en œuvre du #strong[PreSkool Management System] a été confrontée à 
 
 #strong[Solution] : Afin de garantir une base de code propre et maintenable, la décision a été prise de développer une interface utilisateur personnalisée à partir de zéro. Cette approche a permis de mettre en œuvre une structure de #strong[template] plus efficace et un #strong[static asset pipeline] plus léger. Un relevé complet de la structure originale des fichiers de ressources est documenté dans `/report/template-file-tree.md`.
 
+Voir : #link("https://github.com/bilal-houari/m361-pfm/blob/main/report/template-file-tree.md").
+
 == Sécurité et contrôle d'accès (RBAC)
 #strong[Défi] : L'implémentation d'un accès cohérent basé sur les rôles à travers huit applications distinctes nécessitait un mécanisme de sécurité centralisé pour empêcher l'accès non autorisé aux données entre les #strong[Admins], les #strong[Teachers] et les #strong[Students].
 
