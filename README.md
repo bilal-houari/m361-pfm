@@ -8,7 +8,7 @@
 > - **Part 1 (TP & Template Exploration)**: [m361/pfm-tp-guide](https://github.com/bilal-houari/m361/blob/main/pfm-tp-guide)
 
 ## Video Demonstration
-The video has been uploaded to the repository : https://github.com/bilal-houari/m361-pfm/blob/main/demo.mp4)
+The video has been uploaded to the repository : https://github.com/bilal-houari/m361-pfm/blob/main/demo.mp4
 
 ## Technical Stack
 - **Backend**: Django 6.x
