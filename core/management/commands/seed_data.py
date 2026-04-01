@@ -138,6 +138,11 @@ class Command(BaseCommand):
                     department=dept
                 )
                 
+                # Assign teacher@preskool.com to Geometry specifically
+                if name == 'Geometry' and main_teacher.subject is None:
+                    main_teacher.subject = subject
+                    main_teacher.save()
+                
                 # Each subject gets at least 1-2 teachers
                 # Assign unassigned teachers first
                 for _ in range(2):
@@ -148,7 +153,7 @@ class Command(BaseCommand):
                 
                 subjects.append(subject)
         
-        # Ensure main teacher has a subject
+        # Fallback if Geometry wasn't found for some reason
         if main_teacher.subject is None:
             main_teacher.subject = random.choice(subjects)
             main_teacher.save()
@@ -169,21 +174,30 @@ class Command(BaseCommand):
                 grade_level=level
             )
             
-            # Pick 5-8 random subjects for this class
-            class_subjects = random.sample(subjects, k=random.randint(5, 8))
+            # Pick other random subjects
+            available_subjects = [s for s in subjects if s != main_teacher.subject]
+            class_subjects = random.sample(available_subjects, k=random.randint(4, 7))
             
-            # For each subject, assign ONE teacher
+            # ALWAYS include the main teacher's subject in every class to ensure they have load
+            class_subjects.append(main_teacher.subject)
+            
+            # For each subject, assign ONE teacher specializing in it
             for subject in class_subjects:
-                # Filter teachers who actually teach this subject (if any)
-                subject_teachers = list(subject.teachers.all())
-                if not subject_teachers:
-                    subject_teachers = teachers # Fallback if no specific teacher is assigned to the subject itself
-                
-                teacher = random.choice(subject_teachers)
-                
-                # Make sure main teacher is assigned to something in Grade 8
-                if level == 8 and main_teacher in subject_teachers and not school_class.assignments.filter(teacher=main_teacher).exists():
+                if subject == main_teacher.subject:
+                    # Always assign main teacher to their subject
                     teacher = main_teacher
+                else:
+                    # Strictly filter teachers who actually teach this subject
+                    subject_teachers = list(Teacher.objects.filter(subject=subject))
+                    if not subject_teachers:
+                        # If no specialist, pick a teacher from the same department
+                        subject_teachers = list(Teacher.objects.filter(subject__department=subject.department))
+                    
+                    if not subject_teachers:
+                        # Final fallback: any teacher
+                        teacher = random.choice(teachers)
+                    else:
+                        teacher = random.choice(subject_teachers)
 
                 ClassSubjectAssignment.objects.create(
                     school_class=school_class,
@@ -279,32 +293,41 @@ class Command(BaseCommand):
         exam_count = 0
         result_count = 0
         
-        for exam_name in exam_names:
-            # For each class, create exams for their assigned subjects
-            for school_class in classes:
-                # Use the new assignments model to get subjects
-                class_assignments = school_class.assignments.all()
-                if not class_assignments:
-                    continue
-                    
-                # Pick 2-3 subjects per class for this exam type
-                sampled_assignments = random.sample(list(class_assignments), k=min(len(class_assignments), 3))
+        # For each class, manage exams for their assigned subjects
+        for school_class in classes:
+            class_assignments = list(school_class.assignments.all())
+            if not class_assignments:
+                continue
                 
-                for assignment in sampled_assignments:
+            # Fetch students in this class once
+            class_students = [s for s in students if s.school_class == school_class]
+            if not class_students:
+                continue
+
+            for assignment in class_assignments:
+                # Create a set of exams for this specific class and subject
+                for i, exam_name in enumerate(exam_names):
                     exam = Exam.objects.create(
-                        name=f"{exam_name} - {assignment.subject.name}",
-                        date=today - timedelta(days=random.randint(10, 60)), # Recent exams
+                        name=f"{school_class.name} - {exam_name}",
+                        date=today - timedelta(days=random.randint(10, 60)),
                         subject=assignment.subject,
                         school_class=school_class,
                         max_marks=random.choice([50, 100])
                     )
                     exam_count += 1
                     
-                    # Get students in THIS class
-                    class_students = [s for s in students if s.school_class == school_class]
+                    # Detect if this is the "last" exam (e.g. the Monthly Quiz)
+                    # to simulate unfinished grading (20% graded)
+                    is_last_exam = (i == len(exam_names) - 1)
                     
-                    for student in class_students:
-                        # Record result for each student in the class
+                    if is_last_exam:
+                        # Only 20% of students get a result
+                        graded_students = random.sample(class_students, k=max(1, int(len(class_students) * 0.2)))
+                    else:
+                        # All students get a result
+                        graded_students = class_students
+
+                    for student in graded_students:
                         ExamResult.objects.create(
                             exam=exam,
                             student=student,
@@ -312,4 +335,4 @@ class Command(BaseCommand):
                         )
                         result_count += 1
                     
-        self.stdout.write(f'  - {exam_count} Exams and {result_count} Exam Results created (class-aware)')
+        self.stdout.write(f'  - {exam_count} Exams and {result_count} Exam Results created (highly class-aware + partial grading)')

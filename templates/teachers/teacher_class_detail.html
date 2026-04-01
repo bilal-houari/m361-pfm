@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ school_class.name }} Roster - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <div style="display: flex; align-items: center; gap: var(--spacing-unit) * 1; margin-bottom: 4px;">
+            <a href="{% url 'teacher-class-list' %}" class="btn btn-sm btn-outline" style="border: none; padding: 0 8px;"><i class="fas fa-arrow-left"></i></a>
+            <h2 style="margin-bottom: 0;">{{ school_class.name }}</h2>
+        </div>
+        <p>Enrollment group roster for <strong>{{ subject.name }}</strong> (Grade {{ school_class.grade_level }})</p>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'exam-add' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Schedule Exam
+        </a>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Adm. No</th>
+                <th>Student Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td><span class="badge">{{ student.admission_number }}</span></td>
+                <td>
+                    <span class="font-weight-bold">{{ student.user.get_full_name }}</span>
+                </td>
+                <td class="text-muted">{{ student.user.email }}</td>
+                <td>{{ student.phone_number }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="table-empty">
+                    <i class="fas fa-users-slash"></i>
+                    <p>No students enrolled in this class yet.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

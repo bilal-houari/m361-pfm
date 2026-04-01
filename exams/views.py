@@ -1,10 +1,10 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.shortcuts import get_object_or_404, redirect
-from core.mixins import AdminRequiredMixin
+from core.mixins import AdminRequiredMixin, TeacherRequiredMixin, TeacherOnlyRequiredMixin
 from .models import Exam, ExamResult
+from .forms import TeacherExamForm
 from students.models import Student
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class ExamListView(LoginRequiredMixin, ListView):
@@ -17,28 +17,51 @@ class ExamListView(LoginRequiredMixin, ListView):
         if self.request.user.role == 'STUDENT':
             student = getattr(self.request.user, 'student_profile', None)
             if student and student.school_class:
-                return queryset.filter(school_class=student.school_class)
+                return queryset.filter(school_class=student.school_class).order_by('-date')
             return queryset.none()
-        return queryset
+        elif self.request.user.role == 'TEACHER':
+            teacher = getattr(self.request.user, 'teacher_profile', None)
+            if teacher:
+                return queryset.filter(subject=teacher.subject).order_by('-date')
+            return queryset.none()
+        return queryset.order_by('-date')
 
-class ExamCreateView(AdminRequiredMixin, CreateView):
+class ExamCreateView(TeacherOnlyRequiredMixin, CreateView):
     model = Exam
-    fields = ['name', 'date', 'subject', 'max_marks']
+    form_class = TeacherExamForm
     template_name = 'exams/exam_form.html'
     success_url = reverse_lazy('exam-list')
 
-class ExamUpdateView(AdminRequiredMixin, UpdateView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.request.user.role == 'TEACHER':
+            kwargs['teacher'] = self.request.user.teacher_profile
+        return kwargs
+
+    def form_valid(self, form):
+        # Auto-assign teacher's subject
+        if self.request.user.role == 'TEACHER':
+            form.instance.subject = self.request.user.teacher_profile.subject
+        return super().form_valid(form)
+
+class ExamUpdateView(TeacherOnlyRequiredMixin, UpdateView):
     model = Exam
-    fields = ['name', 'date', 'subject', 'max_marks']
+    form_class = TeacherExamForm
     template_name = 'exams/exam_form.html'
     success_url = reverse_lazy('exam-list')
 
-class ExamDeleteView(AdminRequiredMixin, DeleteView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.request.user.role == 'TEACHER':
+            kwargs['teacher'] = self.request.user.teacher_profile
+        return kwargs
+
+class ExamDeleteView(TeacherOnlyRequiredMixin, DeleteView):
     model = Exam
     template_name = 'exams/exam_confirm_delete.html'
     success_url = reverse_lazy('exam-list')
 
-class ExamResultEntryView(AdminRequiredMixin, TemplateView):
+class ExamResultEntryView(TeacherOnlyRequiredMixin, TemplateView):
     template_name = 'exams/exam_result_entry.html'
 
     def get_context_data(self, **kwargs):
@@ -62,7 +85,7 @@ class ExamResultEntryView(AdminRequiredMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        # Admins should not be able to save marks
+        # Admins should not be able to save marks (as per previous request, only academics)
         if request.user.role == 'ADMIN':
             return redirect('exam-list')
             

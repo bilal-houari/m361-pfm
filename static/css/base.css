@@ -2,6 +2,7 @@
 :root {
     /* Colors */
     --primary-color: #007bff;
+    --primary-rgb: 0, 123, 255;
     --primary-hover: #0056b3;
     --accent-color: #ffc107;
     --accent-hover: #e0a800;

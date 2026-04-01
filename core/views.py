@@ -9,6 +9,8 @@ from classes.models import SchoolClass
 def home(request):
     if request.user.role == 'STUDENT':
         return redirect('student-dashboard')
+    elif request.user.role == 'TEACHER':
+        return redirect('teacher-dashboard')
     
     context = {
         'student_count': Student.objects.count(),

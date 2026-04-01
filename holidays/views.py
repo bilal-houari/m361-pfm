@@ -1,9 +1,9 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from core.mixins import AdminRequiredMixin
+from core.mixins import AdminRequiredMixin, TeacherRequiredMixin
 from .models import Holiday
 
-class HolidayListView(AdminRequiredMixin, ListView):
+class HolidayListView(TeacherRequiredMixin, ListView):
     model = Holiday
     template_name = 'holidays/holiday_list.html'
     context_object_name = 'holidays'

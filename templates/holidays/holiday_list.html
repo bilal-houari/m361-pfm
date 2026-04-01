@@ -6,13 +6,15 @@
 <div class="page-header">
     <div class="page-title">
         <h2>School Holidays</h2>
-        <p>View and manage the school holiday calendar.</p>
+        <p>Plan your schedule according to the official school holidays.</p>
     </div>
+    {% if user.role == 'ADMIN' %}
     <div class="page-actions">
         <a href="{% url 'holiday-add' %}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Add Holiday
         </a>
     </div>
+    {% endif %}
 </div>
 
 <div class="table-container">
@@ -22,17 +24,22 @@
                 <th>Holiday Name</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th style="text-align: center;">Duration</th>
                 <th>Description</th>
+                {% if user.role == 'ADMIN' %}
                 <th style="text-align: right;">Actions</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for holiday in holidays %}
             <tr>
                 <td class="font-weight-bold">{{ holiday.name }}</td>
-                <td>{{ holiday.start_date|date:"M d, Y" }}</td>
-                <td>{{ holiday.end_date|date:"M d, Y" }}</td>
+                <td>{{ holiday.start_date|date:"F d, Y" }}</td>
+                <td>{{ holiday.end_date|date:"F d, Y" }}</td>
+                <td style="text-align: center;">{{ holiday.duration }} {% if holiday.duration == 1 %}Day{% else %}Days{% endif %}</td>
                 <td class="text-muted text-sm">{{ holiday.description|truncatechars:50|default:"-" }}</td>
+                {% if user.role == 'ADMIN' %}
                 <td style="text-align: right;">
                     <a href="{% url 'holiday-edit' holiday.pk %}" class="btn btn-sm btn-outline" title="Edit">
                         <i class="fas fa-edit"></i>
@@ -47,12 +54,13 @@
                         <i class="fas fa-trash"></i>
                     </a>
                 </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="table-empty">
+                <td colspan="{% if user.role == 'ADMIN' %}6{% else %}5{% endif %}" class="table-empty">
                     <i class="fas fa-calendar-alt"></i>
-                    <p>No holidays scheduled. <a href="{% url 'holiday-add' %}">Add one now</a>.</p>
+                    <p>No holidays scheduled. {% if user.role == 'ADMIN' %}<a href="{% url 'holiday-add' %}">Add one now</a>.{% endif %}</p>
                 </td>
             </tr>
             {% endfor %}

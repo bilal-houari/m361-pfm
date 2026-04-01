@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teacher Dashboard - PreSkool{% endblock %}
+
+{% block content %}
+<div class="welcome-section" style="margin-bottom: calc(var(--spacing-unit) * 4);">
+    <h1 style="font-size: 1.75rem; color: var(--text-dark);">Welcome back, {{ user.get_full_name }}!</h1>
+    <p class="text-muted">Specialist in <strong>{{ teacher.subject.name }}</strong></p>
+</div>
+
+<!-- Quick Stats -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: calc(var(--spacing-unit) * 3); margin-bottom: calc(var(--spacing-unit) * 4);">
+    <div class="card" style="display: flex; align-items: center; gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 2.5);">
+        <div style="width: 48px; height: 48px; border-radius: var(--border-radius); background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+            <i class="fas fa-chalkboard"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500; margin-bottom: 2px;">My Classes</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); line-height: 1;">{{ class_count }}</div>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; align-items: center; gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 2.5);">
+        <div style="width: 48px; height: 48px; border-radius: var(--border-radius); background: rgba(59, 130, 246, 0.1); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500; margin-bottom: 2px;">Total Students</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); line-height: 1;">{{ student_count }}</div>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; align-items: center; gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 2.5);">
+        <div style="width: 48px; height: 48px; border-radius: var(--border-radius); background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+            <i class="fas fa-building"></i>
+        </div>
+        <div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">Department</div>
+            <div style="font-size: 1.15rem; font-weight: 600; color: var(--text-dark);">{{ department.name }}</div>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: calc(var(--spacing-unit) * 4); align-items: start;">
+    <!-- Assigned Classes -->
+    <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="padding: calc(var(--spacing-unit) * 3); border-bottom: var(--border-width) solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.15rem; color: var(--text-dark); margin: 0;">My Teaching Load</h3>
+            <a href="{% url 'teacher-class-list' %}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="table-container" style="border: none; border-radius: 0;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="padding-left: calc(var(--spacing-unit) * 3);">Class</th>
+                        <th>Subject</th>
+                        <th>Students</th>
+                        <th style="text-align: right; padding-right: calc(var(--spacing-unit) * 3);">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                    <tr>
+                        <td class="font-weight-bold" style="padding-left: calc(var(--spacing-unit) * 3);">{{ assignment.school_class.name }}</td>
+                        <td><span class="badge">{{ assignment.subject.name }}</span></td>
+                        <td>{{ assignment.school_class.student_count }}</td>
+                        <td style="text-align: right; padding-right: calc(var(--spacing-unit) * 3);">
+                            <a href="{% url 'teacher-class-detail' assignment.school_class.pk %}" class="btn btn-sm btn-outline">Roster</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="table-empty">
+                            <i class="fas fa-chalkboard"></i>
+                            <p>No class assignments found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Dept Overview -->
+    <div class="card">
+        <h3 style="font-size: 1.15rem; color: var(--text-dark); margin-bottom: calc(var(--spacing-unit) * 3);">My Specialization</h3>
+        <div style="text-align: center; padding: calc(var(--spacing-unit) * 2);">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto calc(var(--spacing-unit) * 2);">
+                <i class="fas fa-book"></i>
+            </div>
+            <h4 style="font-size: 1.25rem; color: var(--text-dark); margin-bottom: 4px;">{{ teacher.subject.name }}</h4>
+            <p class="text-muted" style="font-size: 0.875rem;">{{ department.name }} Faculty</p>
+            <div style="margin-top: calc(var(--spacing-unit) * 3); padding-top: calc(var(--spacing-unit) * 2); border-top: var(--border-width) solid var(--border-color);">
+                <a href="{% url 'teacher-department' %}" class="btn btn-outline" style="width: 100%;">Department Members</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

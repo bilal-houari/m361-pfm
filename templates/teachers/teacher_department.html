@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}My Department - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>{{ department.name }} Faculty</h2>
+        <p>Overview of your departmental colleagues and academic specialization.</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: calc(var(--spacing-unit) * 4);">
+    <!-- Dept Info -->
+    <div class="card" style="height: fit-content;">
+        <div style="text-align: center; margin-bottom: calc(var(--spacing-unit) * 3);">
+            <div style="width: 64px; height: 64px; border-radius: var(--border-radius); background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto calc(var(--spacing-unit) * 2);">
+                <i class="fas fa-building"></i>
+            </div>
+            <h3 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 4px;">{{ department.name }}</h3>
+            <p class="text-muted" style="font-size: 0.875rem;">Department Faculty</p>
+        </div>
+
+        <div style="padding-top: calc(var(--spacing-unit) * 2); border-top: var(--border-width) solid var(--border-color);">
+            <div style="margin-bottom: calc(var(--spacing-unit) * 2);">
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Staff Count</div>
+                <div style="font-size: 1.15rem; font-weight: 600; color: var(--text-dark);">{{ colleagues.count|add:1 }} Specialized Instructors</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Colleague List -->
+    <div class="card">
+        <h3 style="font-size: 1.15rem; color: var(--text-dark); margin-bottom: calc(var(--spacing-unit) * 3);">Department Colleagues</h3>
+        <div style="display: grid; gap: calc(var(--spacing-unit) * 2);">
+            {% for colleague in colleagues %}
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: calc(var(--spacing-unit) * 2); border-radius: var(--border-radius); background: var(--bg-light); border: var(--border-width) solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: calc(var(--spacing-unit) * 2);">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-dark);">{{ colleague.user.get_full_name }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ colleague.subject.name }} Specialist</div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge" style="font-size: 0.7rem;">{{ colleague.staff_id }}</span>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">{{ colleague.user.email }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; padding: calc(var(--spacing-unit) * 4); color: var(--text-muted);">
+                <i class="fas fa-users-slash" style="font-size: 2rem; margin-bottom: 12px; display: block;"></i>
+                <p>You are the only member in this department.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

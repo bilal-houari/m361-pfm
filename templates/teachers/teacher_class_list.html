@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}My Classes - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>My Assigned Classes</h2>
+        <p>Overview of the enrollment groups and subjects you are currently instructing.</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: calc(var(--spacing-unit) * 3);">
+    {% for assignment in assignments %}
+    <div class="card" style="display: flex; flex-direction: column; gap: calc(var(--spacing-unit) * 2);">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+            <div>
+                <h3 style="font-size: 1.25rem; color: var(--text-dark); margin-bottom: 4px;">{{ assignment.school_class.name }}</h3>
+                <p class="text-muted" style="font-size: 0.875rem;">Grade {{ assignment.school_class.grade_level }}</p>
+            </div>
+            <div style="padding: 6px 12px; border-radius: 20px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                {{ assignment.subject.name }}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--spacing-unit) * 2); padding: calc(var(--spacing-unit) * 2) 0; border-top: var(--border-width) solid var(--border-color); border-bottom: var(--border-width) solid var(--border-color);">
+            <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Students</div>
+                <div style="font-size: 1.15rem; font-weight: 600; color: var(--text-dark);">{{ assignment.school_class.student_count }}</div>
+            </div>
+            <div>
+                <!-- Removed Dept info as requested -->
+            </div>
+        </div>
+
+        <div style="display: flex; gap: var(--spacing-unit); margin-top: calc(var(--spacing-unit) * 1);">
+            <a href="{% url 'teacher-class-detail' assignment.school_class.pk %}" class="btn btn-primary btn-sm" style="flex: 1;">
+                <i class="fas fa-users-viewfinder"></i> View Roster
+            </a>
+            <a href="{% url 'exam-list' %}" class="btn btn-outline btn-sm" style="flex: 1;">
+                <i class="fas fa-file-invoice"></i> Manage Exams
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: calc(var(--spacing-unit) * 6);">
+        <i class="fas fa-chalkboard" style="font-size: 3rem; color: var(--border-color); margin-bottom: calc(var(--spacing-unit) * 2);"></i>
+        <h3 style="font-size: 1.25rem; color: var(--text-dark);">No classes assigned yet.</h3>
+        <p class="text-muted">Please contact the administrator to assign you to a class and subject.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

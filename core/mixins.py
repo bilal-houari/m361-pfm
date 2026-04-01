@@ -11,3 +11,7 @@ class TeacherRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 class StudentRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.role == 'STUDENT'
+
+class TeacherOnlyRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.role == 'TEACHER'
