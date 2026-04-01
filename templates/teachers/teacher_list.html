@@ -20,6 +20,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Subject</th>
                 <th>Specialization</th>
                 <th>Email</th>
                 <th>Joining Date</th>
@@ -32,6 +33,7 @@
                 <td>
                     <span class="font-weight-bold">{{ teacher.user.get_full_name }}</span>
                 </td>
+                <td><span class="badge" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color);">{{ teacher.subject.name|default:"-" }}</span></td>
                 <td><span class="badge">{{ teacher.specialization }}</span></td>
                 <td class="text-muted">{{ teacher.user.email }}</td>
                 <td class="text-muted">{{ teacher.joining_date|date:"M d, Y" }}</td>
@@ -52,7 +54,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="table-empty">
+                <td colspan="6" class="table-empty">
                     <i class="fas fa-chalkboard-teacher"></i>
                     <p>No teachers found. <a href="{% url 'teacher-add' %}">Add one now</a>.</p>
                 </td>

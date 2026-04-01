@@ -11,6 +11,7 @@ from students.models import Student
 # Admin-only Views
 class TeacherListView(AdminRequiredMixin, ListView):
     model = Teacher
+    queryset = Teacher.objects.select_related('user', 'subject')
     template_name = 'teachers/teacher_list.html'
     context_object_name = 'teachers'
 

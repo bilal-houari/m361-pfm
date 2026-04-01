@@ -59,7 +59,7 @@ class Command(BaseCommand):
             self.stdout.write('  - Admin (Superuser) created')
 
     def create_departments(self):
-        dept_names = ['Mathematics', 'Science', 'Languages', 'Arts', 'Physical Education', 'Computer Science']
+        dept_names = ['Mathematics', 'Science', 'Languages', 'Humanities', 'Physical Education', 'Computer Science']
         departments = []
         for name in dept_names:
             dept, created = Department.objects.get_or_create(
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         )
         teachers.append(main_teacher)
 
-        for _ in range(29): # More teachers to cover all subjects
+        for _ in range(39): # Scaling up to 40 teachers
             email = fake.unique.email()
             user = CustomUser.objects.create_user(
                 email=email,
@@ -117,9 +117,9 @@ class Command(BaseCommand):
         subject_data = {
             'Mathematics': ['Algebra', 'Geometry', 'Calculus'],
             'Science': ['Physics', 'Chemistry', 'Biology'],
-            'Languages': ['English', 'French', 'Spanish'],
-            'Arts': ['History', 'Geography', 'Fine Arts'],
-            'Physical Education': ['Sports', 'Yoga'],
+            'Languages': ['English', 'French'],
+            'Humanities': ['History', 'Geography'],
+            'Physical Education': ['Sports'],
             'Computer Science': ['Programming', 'Networking', 'Web Dev']
         }
         
@@ -153,17 +153,18 @@ class Command(BaseCommand):
                 
                 subjects.append(subject)
         
-        # Fallback if Geometry wasn't found for some reason
-        if main_teacher.subject is None:
-            main_teacher.subject = random.choice(subjects)
-            main_teacher.save()
+        # Ensure NO teacher is left without a subject
+        while unassigned_teachers:
+            teacher = unassigned_teachers.pop(0)
+            teacher.subject = random.choice(subjects)
+            teacher.save()
             
-        self.stdout.write(f'  - {len(subjects)} Subjects created and teachers assigned')
+        self.stdout.write(f'  - {len(subjects)} Subjects created and all {len(teachers)} teachers assigned specializations')
         return subjects
 
     def create_classes(self, teachers, subjects):
         classes = []
-        grade_levels = range(1, 11) # Grades 1-10
+        grade_levels = range(1, 13) # Grades 1-12
         
         main_teacher = next(t for t in teachers if t.user.email == 'teacher@preskool.com')
         
@@ -183,19 +184,27 @@ class Command(BaseCommand):
             
             # For each subject, assign ONE teacher specializing in it
             for subject in class_subjects:
-                if subject == main_teacher.subject:
-                    # Always assign main teacher to their subject
-                    teacher = main_teacher
+                # Strictly filter teachers who actually teach this subject (including main_teacher)
+                subject_teachers = list(Teacher.objects.filter(subject=subject))
+                if not subject_teachers:
+                    # If no specialist, pick a teacher from the same department
+                    subject_teachers = list(Teacher.objects.filter(subject__department=subject.department))
+                
+                if not subject_teachers:
+                    # Final fallback: any teacher (excluding main_teacher if it's junior grade)
+                    pool = [t for t in teachers if t != main_teacher or level >= 7]
+                    teacher = random.choice(pool if pool else teachers)
                 else:
-                    # Strictly filter teachers who actually teach this subject
-                    subject_teachers = list(Teacher.objects.filter(subject=subject))
-                    if not subject_teachers:
-                        # If no specialist, pick a teacher from the same department
-                        subject_teachers = list(Teacher.objects.filter(subject__department=subject.department))
-                    
-                    if not subject_teachers:
-                        # Final fallback: any teacher
-                        teacher = random.choice(teachers)
+                    # Equitable Distribution Logic:
+                    # Main teacher ONLY takes their subject for senior grades (7-12)
+                    # For junior grades (1-6), they are EXCLUDED from their subject
+                    if subject == main_teacher.subject:
+                        if level >= 7:
+                            teacher = main_teacher
+                        else:
+                            # junior grade: exclude main_teacher from selection
+                            others = [t for t in subject_teachers if t != main_teacher]
+                            teacher = random.choice(others if others else subject_teachers)
                     else:
                         teacher = random.choice(subject_teachers)
 
@@ -236,7 +245,7 @@ class Command(BaseCommand):
         )
         students.append(main_student)
 
-        for _ in range(199): # Total students = 200
+        for _ in range(299): # Total students = 300
             email = fake.unique.email()
             user = CustomUser.objects.create_user(
                 email=email,
