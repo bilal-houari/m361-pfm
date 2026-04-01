@@ -8,7 +8,9 @@
 > - **Part 1 (TP & Template Exploration)**: [m361/pfm-tp-guide](https://github.com/bilal-houari/m361/blob/main/pfm-tp-guide)
 
 ## Video Demonstration
-![Video Demonstration](https://github.com/bilal-houari/m361-pfm/releases/download/1.0/vid.webm)
+<video src="https://github.com/bilal-houari/m361-pfm/releases/download/1.0/vid.webm" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
 
 ## Technical Stack
 - **Backend**: Django 6.x
