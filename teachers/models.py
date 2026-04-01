@@ -23,12 +23,20 @@ class Teacher(models.Model):
         return None
 
     def save(self, *args, **kwargs):
+        # Auto-generate staff_id if it doesn't exist
         if not self.staff_id:
             random_suffix = ''.join(random.choices(string.digits, k=3))
             self.staff_id = f"STAFF-{random_suffix}"
-            
             while Teacher.objects.filter(staff_id=self.staff_id).exists():
                 random_suffix = ''.join(random.choices(string.digits, k=3))
                 self.staff_id = f"STAFF-{random_suffix}"
+        
+        # Detect if subject has changed
+        if self.pk:
+            old_teacher = Teacher.objects.get(pk=self.pk)
+            if old_teacher.subject != self.subject:
+                # Subject has changed, unassign from all classes
+                from classes.models import ClassSubjectAssignment
+                ClassSubjectAssignment.objects.filter(teacher=self).delete()
         
         super().save(*args, **kwargs)

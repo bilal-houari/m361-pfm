@@ -11,6 +11,8 @@ class SchoolClassListView(AdminRequiredMixin, ListView):
     template_name = 'classes/class_list.html'
     context_object_name = 'classes'
 
+from .forms import ClassSubjectAssignmentForm
+
 class SchoolClassDetailView(AdminRequiredMixin, DetailView):
     model = SchoolClass
     template_name = 'classes/class_detail.html'
@@ -22,9 +24,8 @@ class SchoolClassDetailView(AdminRequiredMixin, DetailView):
         context['students'] = school_class.students.all().select_related('user')
         # Map assignments
         context['assignments'] = school_class.assignments.all().select_related('subject', 'teacher__user')
-        # For the assignment form modal/section
-        context['all_subjects'] = Subject.objects.all()
-        context['all_teachers'] = Teacher.objects.all().select_related('user')
+        # Simplified teacher selection for the assignment modal
+        context['assignment_form'] = ClassSubjectAssignmentForm()
         return context
 
 class SchoolClassCreateView(AdminRequiredMixin, CreateView):
@@ -47,23 +48,22 @@ class SchoolClassDeleteView(AdminRequiredMixin, DeleteView):
 # Assignment Management
 class ClassSubjectAssignmentCreateView(AdminRequiredMixin, CreateView):
     model = ClassSubjectAssignment
-    fields = ['subject', 'teacher']
+    form_class = ClassSubjectAssignmentForm
+    template_name = 'classes/assignment_form.html'
     
     def form_valid(self, form):
         school_class = get_object_or_404(SchoolClass, pk=self.kwargs['class_pk'])
-        subject = form.cleaned_data['subject']
         teacher = form.cleaned_data['teacher']
         
-        # Validation: Teacher must teach the subject
-        if teacher.subject != subject:
+        if not teacher.subject:
             from django.core.exceptions import ValidationError
-            form.add_error('teacher', f"This teacher only teaches {teacher.subject.name if teacher.subject else 'nothing'}.")
+            form.add_error('teacher', "This teacher has no assigned subject.")
             return self.form_invalid(form)
 
         # Handle update_or_create to enforce "one teacher per subject per class"
         ClassSubjectAssignment.objects.update_or_create(
             school_class=school_class,
-            subject=subject,
+            subject=teacher.subject,
             defaults={'teacher': teacher}
         )
         return redirect('class-detail', pk=school_class.pk)

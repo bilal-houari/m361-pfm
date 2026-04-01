@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Instructor - PreSkool{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-title">
+        <h2>Assign Instructor</h2>
+        <p>Manage faculty assignments for the selected class.</p>
+    </div>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="post" class="form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label" for="{{ form.teacher.id_for_label }}">Select Teacher</label>
+            {{ form.teacher }}
+            <p class="text-muted text-xs mt-1">Teachers are listed with their primary specialization. Assigning a teacher automatically fills the subject for this class.</p>
+            {% if form.teacher.errors %}
+                <p class="text-error">{{ form.teacher.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-actions" style="margin-top: calc(var(--spacing-unit) * 4); display: flex; gap: 1rem; justify-content: flex-end;">
+            <a href="{{ request.META.HTTP_REFERER|default:'/classes/' }}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Assignment</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
