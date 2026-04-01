@@ -1,9 +1,8 @@
 # PreSkool Management System
 
 > [!IMPORTANT]
-> **Implementation Note**: This project utilizes a custom-built user interface rather than the provided Bootstrap template. This decision was made due to the technical complexity and file redundancy of the original assets, as detailed in **Section 4.2 (Frontend Implementation and Template Constraints)** of the project report.
+> **Implementation Note**: This project utilizes a custom-built user interface rather than the provided Bootstrap template. This decision was made due to the technical complexity and file redundancy of the original assets, as detailed in **Section IV.2 Mise en œuvre du frontend et contraintes de templates** of the project report.
 >
-> **Project Resources:**
 > - **Project Report (PDF)**: [report/report.pdf](https://github.com/bilal-houari/m361-pfm/blob/main/report/report.pdf)
 > - **Template File Tree**: [report/template-file-tree.md](https://github.com/bilal-houari/m361-pfm/blob/main/report/template-file-tree.md)
 > - **Part 1 (TP & Template Exploration)**: [m361/pfm-tp-guide](https://github.com/bilal-houari/m361/blob/main/pfm-tp-guide)
