@@ -7,6 +7,9 @@
 > - **Template File Tree**: [report/template-file-tree.md](https://github.com/bilal-houari/m361-pfm/blob/main/report/template-file-tree.md)
 > - **Part 1 (TP & Template Exploration)**: [m361/pfm-tp-guide](https://github.com/bilal-houari/m361/blob/main/pfm-tp-guide)
 
+## Video Demonstration
+![Video Demonstration](https://github.com/bilal-houari/m361-pfm/releases/download/1.0/vid.webm)
+
 ## Technical Stack
 - **Backend**: Django 6.x
 - **Database**: SQLite
