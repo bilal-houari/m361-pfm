@@ -8,8 +8,8 @@
 > - **Part 1 (TP & Template Exploration)**: [m361/pfm-tp-guide](https://github.com/bilal-houari/m361/blob/main/pfm-tp-guide)
 
 ## Video Demonstration
-![](https://github.com/bilal-houari/m361-pfm/blob/main/demo.webm)
-<video src="https://github.com/bilal-houari/m361-pfm/blob/main/demo.webm" controls="controls" style="max-width: 100%;">
+![](https://github.com/bilal-houari/m361-pfm/blob/main/demo.mp4)
+<video src="https://github.com/bilal-houari/m361-pfm/blob/main/demo.mp4" controls="controls" style="max-width: 100%;">
   Your browser does not support the video tag.
 </video>
 
