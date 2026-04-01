@@ -1,3 +1,4 @@
+```
 ❯ tree static
 static
 └── assets
@@ -692,3 +693,4 @@ static
             └── jquery.slimscroll.min.js
 
 125 directories, 566 files
+```
